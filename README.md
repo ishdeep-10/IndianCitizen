@@ -13,11 +13,21 @@ Football analytics has become increasingly popular in recent years, offering val
 IndianCityzen aims to provide a platform for football enthusiasts to explore data science techniques applied to soccer. Whether you're a beginner looking to get started or an experienced analyst seeking advanced tools, this repository has something for everyone.
 
 ## Features
+### MatchReport.ipynb includes
 - Shotmap: Visualize shot locations on the field to analyze shooting patterns and effectiveness.
 - Passmap: Explore passing networks and patterns to understand team dynamics and strategy.
 - Goalmap: Analyze goal locations to identify scoring trends and player performance.
 - Passing Network: Visualize passing networks to uncover passing relationships between players.
+
+### RadarPlot.ipynb includes
 - Radar Plots: Create radar plots to compare player statistics across different metrics.
+- Age v Minutes Played : Scatter plot to compare the number of minutes played per player in a season in correlation with their age
+
+### Data Sources
+- WhoScored.com
+- FotMob
+- Understat
+- FBref
 
 Feel free to explore the code, modify it according to your requirements, and contribute your own insights and visualizations.
 
