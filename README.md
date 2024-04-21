@@ -1,4 +1,4 @@
-# IndianCitizen: Football Analytics with Python
+# IndianCitizen: A central repo for Football/Soccer Analytics
 
 <p align="left">
   <img src="Images/Logo.png" width="200" title="Logo">
