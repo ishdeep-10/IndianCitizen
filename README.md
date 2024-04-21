@@ -1,5 +1,9 @@
 # IndianCityzen: Football Analytics with Python
 
+<p align="left">
+  <img src="Images/IndianCityzen.png" width="200" title="Logo">
+</p>
+
 Welcome to IndianCityzen, your go-to repository for football/soccer analytics using Python and related libraries. This repository covers various topics in data science applied to sports, particularly focusing on football analytics. Here, you'll find code examples, tutorials, and resources to help you analyze and visualize football data efficiently.
 
 ## Table of Contents
