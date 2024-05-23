@@ -28,7 +28,7 @@ IndianCityzen aims to provide a platform for football enthusiasts to explore dat
 - Age v Minutes Played : Scatter plot to compare the number of minutes played per player in a season in correlation with their age
 
 ### Models
-- xG : Understanding the concepts of how xG is calculated and what all features are used for evaluation.
+- xG : Understanding the concepts of how xG is calculated and what all features are used for evaluation. Medium article - https://medium.com/@ishdeepsinghchadha/understanding-xg-part-2-d74d17f62fef
 
 ### Data Sources
 - WhoScored.com
