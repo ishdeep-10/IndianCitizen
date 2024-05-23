@@ -27,6 +27,9 @@ IndianCityzen aims to provide a platform for football enthusiasts to explore dat
 - Radar Plots: Create radar plots to compare player statistics across different metrics.
 - Age v Minutes Played : Scatter plot to compare the number of minutes played per player in a season in correlation with their age
 
+### Models
+- xG : Understanding the concepts of how xG is calculated and what all features are used for evaluation.
+
 ### Data Sources
 - WhoScored.com
 - FotMob
