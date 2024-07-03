@@ -21,20 +21,24 @@ IndianCityzen aims to provide a platform for football enthusiasts to explore dat
 - Shotmap: Visualize shot locations on the field to analyze shooting patterns and effectiveness.
 - Passmap: Explore passing networks and patterns to understand team dynamics and strategy.
 - Goalmap: Analyze goal locations to identify scoring trends and player performance.
-- Passing Network: Visualize passing networks to uncover passing relationships between players.
+- xG Plot: Visualizing the xG created by both teams in a football match throughout the 90 mins.
 
 ### RadarPlot.ipynb includes
 - Radar Plots: Create radar plots to compare player statistics across different metrics.
 - Age v Minutes Played : Scatter plot to compare the number of minutes played per player in a season in correlation with their age
 
 ### Models
-- xG : Understanding the concepts of how xG is calculated and what all features are used for evaluation. Medium article - https://medium.com/@ishdeepsinghchadha/understanding-xg-part-2-d74d17f62fef
+- xG : Understanding the concepts of how xG is calculated and what all features are used for evaluation. - https://medium.com/@ishdeepsinghchadha/understanding-xg-part-2-d74d17f62fef
+- xT : Understanding how actions other than shots can be calculated as threats that lead up to goal scoring oppurtunities. https://medium.com/@ishdeepsinghchadha/understanding-expected-threat-xt-part-1-ac3c6198512e
+- Predicting Scores : Using poisson distribution to predict the score of a football match based on historical results. - https://medium.com/@ishdeepsinghchadha/simulating-a-football-match-4d971d1a8c36
+- Pitch Control : Using tracking data to understand how different players contribute to control certain spaces on a football pitch. - https://medium.com/@ishdeepsinghchadha/pitch-control-finding-the-right-pass-40e42323ceab
 
 ### Data Sources
 - WhoScored.com
 - FotMob
 - Understat
 - FBref
+- Sofascore
 
 Feel free to explore the code, modify it according to your requirements, and contribute your own insights and visualizations.
 
