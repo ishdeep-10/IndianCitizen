@@ -41,7 +41,7 @@ def plot_shots(df, ax, pitch):
 st.title("Premier League 2024 ShotMap")
 st.subheader("Filter to any team or player to see shots taken")
 
-df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/StreamLit/data/premier_league_2024-25_shot_data.csv')
+df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/StreamLit/Data/2024-25/PL/premier_league_2024-25_shot_data.csv')
 #print(df.head())
 
 team = st.selectbox('Select Team',df['teamName'].sort_values().unique(),index=None)
