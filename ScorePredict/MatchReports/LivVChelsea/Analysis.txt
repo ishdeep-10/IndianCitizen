@@ -1,0 +1,41 @@
+1-
+Arne Slot has successfully passed his first big test of the season with beating a young and dangerous Chelsea team at home. Although this was not Liverpool's best performance and Chelsea did in fact cause many problems but in the end it was the reds who secured the win with a fine margin of one goal.
+
+Both teams neither overperformed nor underperformed their cumulative xG but Chelsea had more shots than Liverpool, however Liverpool had more on target.
+Chelsea dominated possession too specially in the first half when Liverpool unsually opt to not press Chelsea high up their penalty box and were allowing them to bring the ball out from the defense.
+
+Chelsea had a higher passing accuracy too than somewhat lackluster Liverpool but they could not create many big chances in front of the goal.
+
+2-
+The first goal came from an array of events specially down the left hand side of Chelsea's defense which was repeatedly exploited by Salah and company to cause issues. 
+Salah put in a dangerous cross into the penalty box for Jones who was clipped by Colwill uncomfortably and forced Jones on the ground and refree gave a penalty which was smashed home beautifully by the Egyptial King - Salah.
+
+Although Chelsea had much better possession in the first half they were not able to create any clear cut chances and some credit has to been given specially to Trent who had a superb defensive performance to avoid any danger in behind.
+
+Chelsea started the second half much better and took advantage of the high line from Liverpool when Jackson was fed by Caicedo in behind and had a one on one chance which he finished clinically. 
+
+However shorty Liverpool took advantage of Chelsea's high defensive line when Salah played a low cross into the zone 14 behind Chelsea's centerbacks where Curtis Jones made a timely run to finish off and give the reds the lead of 2-1.
+
+3-
+Centralized Passing: Liverpool's passing network is primarily focused on the central areas of the pitch.
+Wider Passing: Chelsea's passing network is more expansive, with players involved in passing combinations from the wings which made them more susceptible to counterattacks when they lost possession in advanced areas.
+
+Another key difference is how both team's centerbacks are placed on the pitch
+Liverpool's pairing like to wide apart from each other to combine well with their fullbacks and gives them the room to play those long balls to the wingers.
+Chelsea's CBs played much closer to one another as Liverpool's wide players were not pressing them high up and rather sitting inside to cover Chelsea's fullbacks.
+
+4-
+Chelsea had both higher passes (542-409) and touches (712-563) than Liverpool specially in the center of the pitch which is why we see a much dominated blue than red in the plot.
+This was due to the midblock from Liverpool allowing Chelsea to play to the wide areas from midfield but were not allowing them to play in between the lines and that is why we didn't see much of Cole Palmer yesterday who was tracked and tackled continuously by Liverpool's midfield and did not provide him with any space whatsoever just outside of Liverpool's penalty box where he is seen to be the most dangerous.
+
+5-
+Liverpool and Chelsea adopted different strategies in their final third entries. Liverpool's more patient and structured approach emphasized possession and control, while Chelsea's direct and individualistic style aimed for quick and decisive attacks.
+And that is why there is a significant difference in the number of final third entries but Chelsea has much less to show for it.
+Another key thing to note here is that most of the Chelsea's entries have ended away from the goal rather than towards the goal which shows how Liverpool's defense were able to force their wingers towards the byline rather than cutting inside.
+
+6-
+Curtis Jones probably had his one of the best performances for Liverpool against Chelsea.
+Contributing significantly to Liverpool's victory. His goal-scoring ability, creative playmaking, and accurate passing were key factors in his success. His left-sided focus could be a tactical preference or a reflection of his individual playing style.
+He had a big task in covering the tricky palmer which he executed to perfection and more over was a constant threat to Chelsea's goal and made dangerous runs into the penalty box time and time again which also resulted for a goal.
+
+
