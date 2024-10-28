@@ -1,0 +1,61 @@
+1 -
+A big match in the Seria A never ever disappoints specially if it is the Derby d'Italia!
+8 goals in one of the biggest matches of the season in the Italian league is an absolutely rare occurrence.
+Both teams were clinical in front of goal, converting their chances effectively.
+Juventus edged Inter in terms of possession but Inter had much more bigger and better chances specially in the first half of the game. Almost each stat of this match shows how even this game was but in truth Juventus late comeback was not seen coming by many.
+
+2-
+First half featured five goals beginning with Marcus Thuram winning a penalty after a clumsy challenge, which Zielinski converted coolly comfortably.
+
+Juve equalised five minutes later through Dusan Vlahovic after a nice finish selflessly assisted by Weston Mckenni, and further took the lead through a strike from Timothy Weah within next 6 minutes.
+
+After Henrikh Mkhitaryan equalised following a neat piece of interplay with Thuram in the 35th minute, Zielinski scored his second penalty of the game to put Inter back on top 3-2.
+
+Dumfries extended Inter's advantage early in the second half, converting at the back post after a corner was flicked into his path, but Juventus were not to be denied a share of the spoils.
+
+Substitute Yildiz reduced the deficit for Juve in the 71st minute, placing an angled drive into the far corner, then stunned San Siro by firing home at the back post eight minutes from time. What a performance by the substitute!
+
+3-
+Inter (Left Panel):
+
+Inter’s passing network is well-structured, with notable connections between players, especially in the midfield and defense.
+Players #6 (de Vrij) and #28 (Pavard) appear central in distribution, as the connection between them is highlighted, with 28 passes exchanged. This suggests a focus on buildup from the back, where de Vrij and Pavard play a key role in advancing the ball.
+The network forms a triangle in midfield with #7, #22, and #23, indicating a cohesive midfield that facilitates ball progression and distribution.
+The average on-ball defensive line for Inter is positioned at 42.42 meters, showing a relatively high line, which implies a proactive approach in possession, allowing players to maintain close connections across the field.
+Juventus (Right Panel):
+
+Juventus’s network is denser in the midfield and left side, showing a preference for left-sided buildup. This is evident from the frequent connections between #6 (Danilo) and #32 (Cabal) with 27 passes exchanged.
+#5 and #21 are central to Juventus’s network, orchestrating plays and linking defense with attack.
+The formation is compact, especially around the middle and left, which could indicate a focus on controlling these areas of the pitch.
+Juventus's average on-ball defensive line is at 34.6 meters, significantly deeper than Inter's, reflecting a more cautious or defensively-minded approach.
+
+Inter's high line and centralized structure aim to control possession and territory, while Juventus's deeper, left-leaning setup and focus on crosses suggest a more cautious, flexible approach
+
+4-
+Both teams had significant amount of touches in their own territories showing how both teams didn't tend to press each other high up the pitch and preferred playing in either a low or mid block.
+Juventus had significant success over the right hand flank of the pitch where Chico Conceicao the young portugese winger and fullback Andrea Cambiaso had a lot of touches.
+
+5-
+Inter:
+
+Higher Final Third Entries: Inter made 35 final third entries compared to Juventus's 42.
+Dominance in the Left Channel: Inter's entries are concentrated in the left channel, indicating they favored attacking from that side.
+Balanced Entry Methods: Inter used both passes (27) and carries (8) to enter the final third, suggesting a varied attacking approach.
+Juventus:
+
+More Final Third Entries: Juventus had a slight advantage in final third entries, with 42 compared to Inter's 35.
+Central Focus: Juventus's entries are more evenly distributed across the central and right channels. This suggests a more balanced attacking approach, focusing on central penetration and creating opportunities from both flanks.
+Predominance of Passes: Juventus relied heavily on passes (28) to enter the final third, with fewer entries by carry (14). This indicates a possession-based approach to build attacks.
+
+6-
+
+nter (Left Panel):
+
+Inter's defensive actions are spread across the pitch but are more concentrated in their own half and especially around the middle third, indicating a focus on defending centrally and maintaining a structured setup.
+The defensive action density near the halfway line suggests that Inter actively pressed and intercepted in midfield, likely to regain possession quickly and control the flow of the game.
+There is notable activity in their defensive third, particularly in central areas, indicating solid defensive coverage around the penalty box to guard against direct attacks.
+Juventus (Right Panel):
+
+Juventus has a much denser cluster of defensive actions concentrated in their defensive third, particularly in the central and left side of their penalty area. This suggests a more conservative, defensively compact approach.
+Defensive actions extend into the midfield but are less concentrated than Inter’s, implying Juventus may have focused more on maintaining a strong defensive block and waiting for Inter to come to them.
+The high density of defensive actions near the penalty box highlights Juventus’s commitment to defending close to goal, likely with the intention of preventing high-quality chances.
