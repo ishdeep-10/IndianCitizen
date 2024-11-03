@@ -29,8 +29,8 @@ def plot_shotmap(df,team,teamcolor):
     total_goals = df[df['eventType'] == 'Goal'].shape[0]
     total_xG = df['expectedGoals'].sum()
     xG_per_shot = total_xG / total_shots
-    #points_average_distance = df['x'].mean()
-    #actual_average_distance = 120 - (df['x'] * 1.2).mean()
+    points_average_distance = df['x'].mean()
+    actual_average_distance = 120 - (df['x'] * 1.2).mean()
     
     pitch = VerticalPitch(
     pitch_type='uefa', 
@@ -186,10 +186,10 @@ def plot_shotmap(df,team,teamcolor):
 
     pitch.draw(ax=ax2)
 
-    '''
+    
     # create a scatter plot at y 100 - average_distance
     ax2.scatter(
-        x=90, 
+        x=60, 
         y=points_average_distance, 
         s=100, 
         color='white',  
@@ -197,15 +197,15 @@ def plot_shotmap(df,team,teamcolor):
     )
     # create a line from the bottom of the pitch to the scatter point
     ax2.plot(
-        [90, 90], 
-        [100, points_average_distance], 
+        [60, 60], 
+        [105, points_average_distance], 
         color='white', 
         linewidth=2
     )
 
     # Add a text label for the average distance
     ax2.text(
-        x=90, 
+        x=60, 
         y=points_average_distance - 4, 
         s=f'Average Distance\n{actual_average_distance:.1f} yards', 
         fontsize=10, 
@@ -213,7 +213,6 @@ def plot_shotmap(df,team,teamcolor):
         color=teamcolor, 
         ha='center'
     )
-    '''
 
     for x in df.to_dict(orient='records'):
         pitch.scatter(
