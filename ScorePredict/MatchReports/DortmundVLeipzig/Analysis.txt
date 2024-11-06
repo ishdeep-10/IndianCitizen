@@ -1,0 +1,52 @@
+1-
+Dortmund hosted RB Leipzig in the 9th round of the Bundesliga and seeing the recent performances from Nuri Sahin's team, coming from three consecutive losses, it was very important for them to get a result against current second in the table Leipzig who had won their last four fixtures. They were able to fight back from one goal down and relive some pressure from their manager's shoulders.
+Key Stats - 
+Dortmund had a significantly higher xG at 3.4, indicating they created higher-quality scoring chances, compared to Leipzig's 0.24.
+Dortmund took 19 shots, 5 of which were on target, while Leipzig had only 6 shots, with just 1 on target. This disparity in shot volume further illustrates Dortmund's offensive dominance.
+Dortmund controlled 56% of possession, showing they had more control of the game and dictated play more often than Leipzig, who had 44%.
+Dortmund completed 83% of their passes accurately, slightly ahead of Leipzig's 79%, indicating better ball retention and distribution.
+
+2-
+Although Dortmund created continuous chances throughout the game and accumulated their xG, the first goal came from Leipzig against the run of play when Luis Openda played a perfect backheel pass to the young Slovenian striker Sesko who hammered the ball into the roof of the net from a very tight angle. Dortmund who has been leaky defensively this season now had to respond well going one down in the first half.
+And they did respond with a goal shortly when Beier converted from point blank range in front of the keeper resulted from a deep set piece play from the corner.
+Second half was purely dominated by Dortmund and prevented Leipzig to create any significant chances and scored the winning goal around the half hour mark.
+The goal came from their main man Guirassy who has been one of the best signings of Bundesliga this season heading the ball into the opposite side of the keeper from another cross from the right hand flank.
+
+3-
+The clarity on Dortmund's passing network shows how well drilled they are as a team where each player likes to play on a specified position. They form a U-shape ring around the center of the pitch and like to rotate the ball from one flank to another with continuously trying to break the opponent lines with the help of their midfield players and the striker who's average position on the ball is deep which shows his abilities to combine play well with his wingers.
+On the other hand Leipzig were a bit lopsided on their left hand side where they tried to play as close to each other as possible and create chances. Leipzig did play a very deep defensive line on the ball and tried to build out from the back.
+Total Passes: Dortmund completed 573 passes compared to Leipzig’s 437, showing their dominance in ball control.
+Accurate Passes: Dortmund achieved 466 accurate passes versus Leipzig’s 343, reinforcing Dortmund’s superior precision and control in possession.
+Crosses, Long Balls, and Penalty Box Entries: Dortmund’s stats are higher across these metrics, highlighting their ability to spread play (crosses), attempt long passes, and make entries into the penalty box. Leipzig’s lower numbers indicate a more constrained approach, likely due to Dortmund’s defensive setup.
+
+4-
+The plot clearly justifies how dominant Dortmund were across the different sectors of the pitch with the ball, specially controlling the midfield with the likes of Brandt and Sabitzer controlling the tempo of the game. Special mention to the young Felix Nmecha who is traditionally a center back but played as a DM in this match. He got one assist , created three big chances and had a passing accuracy of 84% which shows he is very comfortable on the ball. But also his defensive recoveries and interceptions were significant throughout the 90 mins.
+Leipzig's 4 man midfield got outplayed and were unable to win possession at important areas of the field.
+
+5-
+Dortmund:
+Achieved 51 entries into the final third.
+The entries were mostly distributed on the left side (41%) and the center (37%), with fewer entries on the right side (22%).
+42 entries were made by pass, while 9 were by carry, indicating a reliance on passing to progress into the final third.
+
+With 42 entries by pass, Dortmund clearly emphasized structured ball movement and passing sequences to reach the final third. This approach aligns with a possession-based strategy and a reliance on quick passing combinations to break through Leipzig’s defense.
+
+Out of 42 , Nmecha had 10 passes into the final third which is not very common for a DM.
+
+Leipzig:
+Made 31 entries into the final third.
+Their entries were relatively balanced, with 39% through the right side, 35% through the center, and 26% on the left side.
+22 entries were by pass and 9 by carry, showing a mix of passing and ball carrying, though less frequent than Dortmund.
+
+Although they achieved 9 entries by carry (same as Dortmund), Leipzig’s 22 entries by pass highlight less fluidity in moving the ball forward. Their ball progression was more sporadic, reflecting a struggle to maintain sustained pressure against Dortmund. 
+
+6-
+Most of Dortmund's defensive actions came from the right hand side where Emre Can and Pascol Gross had one of their better performances of the season. Can had 11 defensive actions including 3 ball recoveries,4 clearances and even a goal line clearance. The german was on top of his game against Leipzig.
+Another German who was playing out of position but had a great game was their new signing from Brighton, Pascal Gross who was very effective with and without the ball having 5 ball recoveries and 3 clearances and winning 5 out of 7 of his duels.
+
+Leipzig had to defend deep into own box with most of their actions across the two flanks where both Dortmund's wingers caused a lot of trouble. The Hungarian center back Willi Orban contributed a lot to keeping Dortmund at bay with 18 defensive actions including 13 clearances and 5 ball recoveries. But their was not much help from his other 3 defenders who were continuously struggling against the calculated attacks from Dortmund.
+
+7-
+The man of the match performance came from German youngster Maximillian Beier who opened the scoring for Dortmund. He contributed to the second goal too with playing a beautiful cross from the right wing which was scored by Dortmund's striker. Overall he caused issues to the Leipzig defense through his darting runs and quick feet along the byline.
+He completed 4 out of his 6 dribbles attempted with 16 passes into the final third and 7 touches inside the opponent box.
+Special mention has to be given to his defensive contribution too where he won 8 out of his 13 ground duels and made 5 ball recoveries.
