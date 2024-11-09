@@ -1,0 +1,67 @@
+Ruben Amorim who is shortly joining Manchester United as head coach superseding Erik Ten Hag has been one of the most exciting coaches in the market for the past few years. He has lead Sporting to multiple titles under his management and is widely known for his structural and positional tactical brilliance of his teams.
+
+Let's try to analyse his team for the current Liga Portugal season and interpret what things we might or might not see replicated for the Red Devils.
+
+1 - 
+This plot illustrates the average positions of players from Sporting CP in Liga Portugal 2024/25, providing insights into their formation and tactical structure.
+Amorim sets up his team in a 3-4-3 in possession and 5-4-1 out of possession. 
+He likes to play a high defensive line with 3 centerbacks and 2 wingbacks and a double pivot of two midfielders to screen the backline.
+High Defensive Line -  This helps in the counter-press because they get closer to the center. Having more players close to the center who can win the ball back makes it difficult for the opposition to recycle possession. Furthermore, the high backline shortens the distance between players, shortening the time and length of the passes and preventing the opposition from pushing up their defense.
+
+In attack he likes to place his two wingers/midfielders close to his striker who can facilitate him with in behind balls because of his massive speed and strength. And the width is provided by the wingbacks who can whip crosses inside the box for the target man.
+
+2-
+This pass flow map for Sporting CF in the 2024/25 Liga Portugal season highlights the team’s passing dynamics and directional tendencies across different zones on the pitch. Each grid cell on the map represents an area of the pitch, with the color intensity indicating the volume of passes (darker areas show higher pass concentration) and the arrows indicating the dominant passing direction.
+
+Central Dominance - 
+The central zone near the halfway line is the darkest, suggesting a high volume of passing activity in this area. This zone likely serves as the primary area for ball distribution and circulation, a common feature for teams aiming to control possession and dictate the game's tempo.
+
+Final Third Entry Points -
+In the opponent’s half, particularly in wide zones close to the final third, the passing flow points inward and forward, indicating a tendency to cut inside. This could imply that Sporting CF’s strategy involves bringing the ball from wide areas into the penalty box, either by crossing or through combination play.
+
+Buildup -
+The lighter shade in the defensive third with backward-pointing arrows shows that while there is some passing activity in these areas, it’s less frequent than in midfield or advanced areas. This likely reflects a quick transition from defense to attack without excessive passing in the defensive half.
+
+3-
+This chart illustrates the distribution of key passes or playmaking actions by Sporting CP, organized by zones across the pitch, leading to shots. Each zone shows the number of actions that started in that area, with higher numbers indicating more frequent involvement in chance creation.
+
+Focus on Central Penetration: The high numbers in the central zones outside and inside the penalty area suggest Sporting CP emphasizes penetrating centrally for chance creation rather than relying heavily on wing play.
+
+Wide Play as a Support Mechanism: While central zones are more active, the wide areas serve as secondary channels for playmaking. This setup might involve quick switches to these areas when central options are blocked.
+
+Left-Side Bias: The slight preference for the left side could be intentional, either due to stronger players on this flank or a tactical choice to exploit perceived weaknesses on the opponent's right side.
+
+4-
+This defensive actions map provides insight into Sporting CP's defensive engagement across different zones of the pitch. Each section shows the percentage of total defensive actions (such as tackles, interceptions, and duels) within that area, represented by darker shades for higher activity.
+
+Mid-Block and Compact Defense: The concentration of defensive actions in Sporting CP’s own half, especially in the central zones, suggests a preference for a mid or low block. This strategy allows the team to remain compact, defend in numbers, and absorb pressure effectively in crucial areas.
+
+Central Midfield Engagement: The significant percentage in central midfield indicates Sporting CP’s emphasis on preventing central progression. The team likely uses this area to apply initial defensive pressure to disrupt opponents and regain possession.
+
+Controlled Wide Defense: With balanced defensive actions across the wings, Sporting CP maintains a moderate level of engagement on the flanks. This likely helps them contain opponents' wide plays without overcommitting defenders, allowing them to quickly shift back to central positions if needed.
+
+Conservative Pressing: Low percentages in advanced areas suggest that Sporting CP does not prioritize high pressing. Instead, they allow opponents some possession in less dangerous areas, conserving energy and focusing on winning the ball back in more central or defensive zones.
+
+
+5-
+As we now have a general idea of how Amorim likes to play his football let's try to compare some player profiles between his existing team and his future team to understand who he might prefer more from multiple options on United's team.
+
+One of the most improved players under Ruben has been the Swedish striker Victor Gyokeres who has scored 15+ goals already in all competitions and is probably going to be the next top striker for whom many teams will be ready to spend some heavy cash.
+On the other hand, United has also two young and upcoming strikers, Rasmund Hojlund and Joshua Zirkzee , which is going to be an interesting pick for Amorim due to the difference in style between the two players.
+
+Looking at the comparison plot between Gyokeres , Hojlund and Zirkzee , although there is a vast difference in numbers showing how good the Sporting's striker has been we feel Hojlund matches the profile a little better than Joshua.
+
+Although Zirkzee has much better playmaking skills proven by his passing numbers his ability in front of the goal is still questionable.
+Hojlund due to his pace and acceleration has the potential to match Gyokeres numbers under Amorim if he decides to play the same style as his previous club.
+
+
+6 and 7-
+One of the most influential players for Amorim has been his midfield duo , Morita and Braganca , playing in a double pivot in midfield these two has been the orchestrators for Sporting in this season.
+Under Ten Hag , United too played in a double pivot and has 4 potential players who can play this position. Let's try to see the numbers for each midfield position and comprehend whom Amorim might prefer in the coming days.
+
+Both Casemiro and Ugarte has had poor starts in the season but under Amorim, Ugarte can change the course of his career if given the required minutes.
+
+The key qualities for both of Sporting's midfield maestros is that they are both very good and impactful on the ball. That is something Amorim might struggle with at United because aside from Mainoo, both Casemiro and Ugarte are more suited for a lone CDM role and their more effective characterstics are for off the ball actions. Erikson too as everyone knows has the capabilities to control the tempo and create chances from deep but because of his injuries it is very unlikely that he will get the most minutes out of all other options.
+The best combination if we were to choose would be Kobbie Mainoo and Ugarte as both of them complement each other with Mainoo's traits to play progressive passes and carries and Ugarte's abilities to screen the midfield and disrupt opposition's attacks with his hard tackling and other defensive actions.
+
+
