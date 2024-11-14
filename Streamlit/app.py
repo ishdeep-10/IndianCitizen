@@ -325,8 +325,8 @@ def plot_shotmap_fotmob(df,team,teamcolor):
 
 
 def plot_shotmap_understat_team(df_shots,team,league,teamcolor):
-    df1 = df_shots[(df_shots['h_team'] == team) & (df_shots['h_a'] == 'h')]
-    df2 = df_shots[(df_shots['a_team'] == team) & (df_shots['h_a'] == 'a')]
+    df1 = df_shots[(df_shots['h_team'] == team) & (df_shots['h_a'] == 'h') & (df_shots['result'] != 'OwnGoal')]
+    df2 = df_shots[(df_shots['a_team'] == team) & (df_shots['h_a'] == 'a') & (df_shots['result'] != 'OwnGoal')]
     df = pd.concat([df1, df2], ignore_index=True)
     df['X'] = (df['X'] / 100) * 105 * 100
     df['Y'] = (df['Y'] / 100) * 68 * 100
@@ -894,6 +894,288 @@ def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player):
     ax3.set_axis_off()
     st.pyplot(fig)
 
+def plot_shotmap_conceded_understat(df_shots,team,league,teamcolor):
+    df11 = df_shots[((df_shots['h_team'] == team) & (df_shots['h_a'] == 'a'))]
+    df21 = df_shots[((df_shots['a_team'] == team) & (df_shots['h_a'] == 'h'))]
+    df1 = pd.concat([df11, df21], ignore_index=True)
+
+    df12 = df_shots[((df_shots['h_team'] == team) & (df_shots['h_a'] == 'h')) & (df_shots['result'] == 'OwnGoal')]
+    df22 = df_shots[((df_shots['a_team'] == team) & (df_shots['h_a'] == 'a')) & (df_shots['result'] == 'OwnGoal')]
+    df2 = pd.concat([df12, df22], ignore_index=True)
+
+    df = pd.concat([df1, df2], ignore_index=True)
+    df['X'] = (df['X'] / 100) * 105 * 100
+    df['Y'] = (df['Y'] / 100) * 68 * 100
+    total_shots = df.shape[0]
+    total_goals = df[(df['result'] == 'Goal') | (df['result'] == 'OwnGoal')].shape[0]
+    total_xG = df['xG'].sum()
+    xG_per_shot = total_xG / total_shots
+    points_average_distance = df['X'].mean()
+    actual_average_distance = 105 - (df['X'] * 1.2).mean()
+    
+    pitch = VerticalPitch(
+    pitch_type='uefa', 
+    half=True, 
+    pitch_color=background, 
+    pad_bottom=.5, 
+    line_color='white',
+    linewidth=.5,
+    axis=True, 
+    label=True
+    )
+
+    # create a subplot with 2 rows and 1 column
+    fig = plt.figure(figsize=(9, 10))
+    fig.patch.set_facecolor(background)
+
+
+    # Top row for the team names and score
+    # [left, bottom, width, height]
+
+    ax1 = fig.add_axes([0, 0.7, 1, .2])
+    ax1.set_facecolor(background)
+    ax1.set_xlim(0, 1)
+    ax1.set_ylim(0, 1)
+
+    ax1.text(
+        x=0.5, 
+        y=.85, 
+        s=team, 
+        fontsize=25, 
+        fontproperties=font_prop, 
+        fontweight='bold', 
+        color=teamcolor, 
+        ha='center'
+    )
+    ax1.text(
+        x=0.5, 
+        y=.7, 
+        s=f'All shots conceded in the {league} 2024-25', 
+        fontsize=18,
+        fontweight='bold',
+        fontproperties=font_prop, 
+        color='white', 
+        ha='center'
+    )
+    ax1.text(
+        x=0.25, 
+        y=0.5, 
+        s=f'Low Quality Chance', 
+        fontsize=14, 
+        fontproperties=font_prop, 
+        color='white', 
+        ha='center'
+    )
+
+    # add a scatter point between the two texts
+    ax1.scatter(
+        x=0.37, 
+        y=0.53, 
+        s=100, 
+        color=background, 
+        edgecolor='white', 
+        linewidth=.8
+    )
+    ax1.scatter(
+        x=0.42, 
+        y=0.53, 
+        s=200, 
+        color=background, 
+        edgecolor='white', 
+        linewidth=.8
+    )
+    ax1.scatter(
+        x=0.48, 
+        y=0.53, 
+        s=300, 
+        color=background, 
+        edgecolor='white', 
+        linewidth=.8
+    )
+    ax1.scatter(
+        x=0.54, 
+        y=0.53, 
+        s=400, 
+        color=background, 
+        edgecolor='white', 
+        linewidth=.8
+    )
+    ax1.scatter(
+        x=0.6, 
+        y=0.53, 
+        s=500, 
+        color=background, 
+        edgecolor='white', 
+        linewidth=.8
+    )
+
+    ax1.text(
+        x=0.75, 
+        y=0.5, 
+        s=f'High Quality Chance', 
+        fontsize=14, 
+        fontproperties=font_prop, 
+        color='white', 
+        ha='center'
+    )
+
+
+    ax1.text(
+        x=0.45, 
+        y=0.27, 
+        s=f'Goal', 
+        fontsize=14, 
+        fontproperties=font_prop, 
+        color='white', 
+        ha='right'
+    )
+    ax1.scatter(
+        x=0.47, 
+        y=0.3, 
+        s=100, 
+        color=teamcolor, 
+        edgecolor='white', 
+        linewidth=.8,
+        alpha=.7
+    )
+
+
+    ax1.scatter(
+        x=0.53, 
+        y=0.3, 
+        s=100, 
+        color=background, 
+        edgecolor='white', 
+        linewidth=.8
+    )
+
+    ax1.text(
+        x=0.55, 
+        y=0.27, 
+        s=f'No Goal', 
+        fontsize=14, 
+        fontproperties=font_prop, 
+        color='white', 
+        ha='left'
+    )
+
+    ax1.set_axis_off()
+
+    
+    ax2 = fig.add_axes([.05, 0.25, .9, .5])
+    ax2.set_facecolor(background)
+    
+    pitch.draw(ax=ax2)
+
+
+    for x in df.to_dict(orient='records'):
+        pitch.scatter(
+            x['X'], 
+            x['Y'], 
+            s=400 * x['xG'], 
+            color=teamcolor if x['result'] == 'Goal' else background, 
+            ax=ax2,
+            alpha=.7,
+            linewidth=.8,
+            edgecolor='white'
+        )
+        
+    ax2.set_axis_off()
+    
+    # add another axis for the stats
+    ax3 = fig.add_axes([0, .2, 1, .05])
+    ax3.set_facecolor(background)
+    ax3.set_xlim(0, 1)
+    ax3.set_ylim(0, 1)
+
+    ax3.text(
+        x=0.25, 
+        y=.5, 
+        s='Shots', 
+        fontsize=20, 
+        fontproperties=font_prop, 
+        fontweight='bold', 
+        color='white', 
+        ha='left'
+    )
+
+    ax3.text(
+        x=0.25, 
+        y=0, 
+        s=f'{total_shots}', 
+        fontsize=16, 
+        fontproperties=font_prop, 
+        color=teamcolor, 
+        ha='left'
+    )
+
+    ax3.text(
+        x=0.38, 
+        y=.5, 
+        s='Goals', 
+        fontsize=20, 
+        fontproperties=font_prop, 
+        fontweight='bold', 
+        color='white', 
+        ha='left'
+    )
+
+    ax3.text(
+        x=0.38, 
+        y=0, 
+        s=f'{total_goals}', 
+        fontsize=16, 
+        fontproperties=font_prop, 
+        color=teamcolor, 
+        ha='left'
+    )
+
+    ax3.text(
+        x=0.53, 
+        y=.5, 
+        s='xG', 
+        fontsize=20, 
+        fontproperties=font_prop, 
+        fontweight='bold', 
+        color='white', 
+        ha='left'
+    )
+
+    ax3.text(
+        x=0.53, 
+        y=0, 
+        s=f'{total_xG:.2f}', 
+        fontsize=16, 
+        fontproperties=font_prop, 
+        color=teamcolor, 
+        ha='left'
+    )
+
+    ax3.text(
+        x=0.63, 
+        y=.5, 
+        s='xG/Shot', 
+        fontsize=20, 
+        fontproperties=font_prop, 
+        fontweight='bold', 
+        color='white', 
+        ha='left'
+    )
+
+    ax3.text(
+        x=0.63, 
+        y=0, 
+        s=f'{xG_per_shot:.2f}', 
+        fontsize=16, 
+        fontproperties=font_prop, 
+        color=teamcolor, 
+        ha='left'
+    )
+
+    ax3.set_axis_off()
+
+    st.pyplot(fig)
+
 
 st.title("Indian Citizen")
 st.subheader("Football Analytics App")
@@ -922,6 +1204,7 @@ color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
 
 if viz == 'Team ShotMap':
     plot_shotmap_understat_team(df, team,league, color[0])
+    plot_shotmap_conceded_understat(df, team,league, color[0])
 elif viz == 'Player ShotMap':
     df1 = df[(df['h_team'] == team) & (df['h_a'] == 'h')]
     df2 = df[(df['a_team'] == team) & (df['h_a'] == 'a')]
