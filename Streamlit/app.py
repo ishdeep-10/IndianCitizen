@@ -1241,8 +1241,8 @@ def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situatio
     st.pyplot(fig)
 
 def plot_shotmap_understat_conceded(df,team,league,teamcolor,situation):
-    df11 = df[((df['h_team'] == team) & (df['h_a'] == 'a'))]
-    df21 = df[((df['a_team'] == team) & (df['h_a'] == 'h'))]
+    df11 = df[((df['h_team'] == team) & (df['h_a'] == 'a')) & (df['result'] != 'OwnGoal')]
+    df21 = df[((df['a_team'] == team) & (df['h_a'] == 'h')) & (df['result'] != 'OwnGoal')]
     df1 = pd.concat([df11, df21], ignore_index=True)
 
     df12 = df[((df['h_team'] == team) & (df['h_a'] == 'h')) & (df['result'] == 'OwnGoal')]
@@ -1682,7 +1682,7 @@ elif league == "La Liga":
 elif league == "Bundesliga":
     df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Bundesliga/2024-25/shot_data.csv')
 elif league == "SerieA":
-    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Seria_A/2024-25/shot_data.csv')
+    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Serie_A/2024-25/shot_data.csv')
 elif league == "Ligue1":
     df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Ligue_1/2024-25/shot_data.csv')
 
