@@ -351,12 +351,22 @@ def plot_shotmap_understat_team(df_shots,team,league,teamcolor,situation):
     total_xG_op = df_openplay['xG'].sum()
     xG_per_shot_op = total_xG_op / total_shots_op
 
+    top_5_op = df_openplay.groupby('player')['id'].count()
+    top_5_shooters_op = top_5_op.sort_values(ascending=False).head(5)
+    top_5_shooters_df_op = top_5_shooters_op.reset_index()
+    top_5_shooters_df_op.columns = ['player', 'number_of_shots']
+
     ## FromCorner
     df_fromcorner = df[df['situation'] == 'FromCorner']
     total_shots_c = df_fromcorner.shape[0]
     total_goals_c = df_fromcorner[df_fromcorner['result'] == 'Goal'].shape[0]
     total_xG_c = df_fromcorner['xG'].sum()
     xG_per_shot_c = total_xG_c / total_shots_c
+
+    top_5_fc = df_fromcorner.groupby('player')['id'].count()
+    top_5_shooters_fc = top_5_fc.sort_values(ascending=False).head(5)
+    top_5_shooters_df_fc = top_5_shooters_fc.reset_index()
+    top_5_shooters_df_fc.columns = ['player', 'number_of_shots']
 
     ## SetPiece
     df_setpiece = df[df['situation'] == 'SetPiece']
@@ -365,6 +375,11 @@ def plot_shotmap_understat_team(df_shots,team,league,teamcolor,situation):
     total_xG_sp = df_setpiece['xG'].sum()
     xG_per_shot_sp = total_xG_sp / total_shots_sp
 
+    top_5_sp = df_setpiece.groupby('player')['id'].count()
+    top_5_shooters_sp = top_5_sp.sort_values(ascending=False).head(5)
+    top_5_shooters_df_sp = top_5_shooters_sp.reset_index()
+    top_5_shooters_df_sp.columns = ['player', 'number_of_shots']
+
     ## DirectFreekick
     df_freekick = df[df['situation'] == 'DirectFreekick']
     total_shots_fk = df_freekick.shape[0]
@@ -372,12 +387,22 @@ def plot_shotmap_understat_team(df_shots,team,league,teamcolor,situation):
     total_xG_fk = df_freekick['xG'].sum()
     xG_per_shot_fk = total_xG_fk / total_shots_fk
 
+    top_5_fk = df_freekick.groupby('player')['id'].count()
+    top_5_shooters_fk = top_5_fk.sort_values(ascending=False).head(5)
+    top_5_shooters_df_fk = top_5_shooters_fk.reset_index()
+    top_5_shooters_df_fk.columns = ['player', 'number_of_shots']
+
     ## Penalty
     df_penalty = df[df['situation'] == 'Penalty']
     total_shots_p = df_penalty.shape[0]
     total_goals_p = df_penalty[df_penalty['result'] == 'Goal'].shape[0]
     total_xG_p = df_penalty['xG'].sum()
     xG_per_shot_p = total_xG_p / total_shots_p
+
+    top_5_p = df_penalty.groupby('player')['id'].count()
+    top_5_shooters_p = top_5_p.sort_values(ascending=False).head(5)
+    top_5_shooters_df_p = top_5_shooters_p.reset_index()
+    top_5_shooters_df_p.columns = ['player', 'number_of_shots']
     
     pitch = VerticalPitch(
     pitch_type='uefa', 
@@ -754,12 +779,40 @@ def plot_shotmap_understat_team(df_shots,team,league,teamcolor,situation):
     ax4.set_facecolor(background)
     ax4.set_xlim(0, 1)
     ax4.set_ylim(0, 1)
+
+    if situation == 'OpenPlay':
+        for i, (player, shots) in enumerate(zip(top_5_shooters_df_op['player'], top_5_shooters_df_op['number_of_shots'])):
+            y_pos = 1 - (i * 0.12)  # Adjust spacing between players
+            ax4.text(0.5, y_pos, player.split()[-1], fontsize=15, fontproperties=font_prop, color='white', ha='center')
+            ax4.text(0.5, y_pos - 0.05, f'{shots} shots', fontsize=12, fontproperties=font_prop, color=teamcolor, ha='center')
+    elif situation == 'FromCorner':
+        for i, (player, shots) in enumerate(zip(top_5_shooters_df_fc['player'], top_5_shooters_df_fc['number_of_shots'])):
+            y_pos = 1 - (i * 0.12)  # Adjust spacing between players
+            ax4.text(0.5, y_pos, player.split()[-1], fontsize=15, fontproperties=font_prop, color='white', ha='center')
+            ax4.text(0.5, y_pos - 0.05, f'{shots} shots', fontsize=12, fontproperties=font_prop, color=teamcolor, ha='center')
+    elif situation == 'SetPiece':
+        for i, (player, shots) in enumerate(zip(top_5_shooters_df_sp['player'], top_5_shooters_df_sp['number_of_shots'])):
+            y_pos = 1 - (i * 0.12)  # Adjust spacing between players
+            ax4.text(0.5, y_pos, player.split()[-1], fontsize=15, fontproperties=font_prop, color='white', ha='center')
+            ax4.text(0.5, y_pos - 0.05, f'{shots} shots', fontsize=12, fontproperties=font_prop, color=teamcolor, ha='center')
+    elif situation == 'DirectFreekick':
+        for i, (player, shots) in enumerate(zip(top_5_shooters_df_fk['player'], top_5_shooters_df_fk['number_of_shots'])):
+            y_pos = 1 - (i * 0.12)  # Adjust spacing between players
+            ax4.text(0.5, y_pos, player.split()[-1], fontsize=15, fontproperties=font_prop, color='white', ha='center')
+            ax4.text(0.5, y_pos - 0.05, f'{shots} shots', fontsize=12, fontproperties=font_prop, color=teamcolor, ha='center')
+    elif situation == 'Penalty':
+        for i, (player, shots) in enumerate(zip(top_5_shooters_df_p['player'], top_5_shooters_df_p['number_of_shots'])):
+            y_pos = 1 - (i * 0.12)  # Adjust spacing between players
+            ax4.text(0.5, y_pos, player.split()[-1], fontsize=15, fontproperties=font_prop, color='white', ha='center')
+            ax4.text(0.5, y_pos - 0.05, f'{shots} shots', fontsize=12, fontproperties=font_prop, color=teamcolor, ha='center')
+    else:
+        for i, (player, shots) in enumerate(zip(top_5_shooters_df['player'], top_5_shooters_df['number_of_shots'])):
+            y_pos = 1 - (i * 0.12)  # Adjust spacing between players
+            ax4.text(0.5, y_pos, player.split()[-1], fontsize=15, fontproperties=font_prop, color='white', ha='center')
+            ax4.text(0.5, y_pos - 0.05, f'{shots} shots', fontsize=12, fontproperties=font_prop, color=teamcolor, ha='center')
     
     # Plot each player's name and their shot count
-    for i, (player, shots) in enumerate(zip(top_5_shooters_df['player'], top_5_shooters_df['number_of_shots'])):
-        y_pos = 1 - (i * 0.12)  # Adjust spacing between players
-        ax4.text(0.5, y_pos, player.split()[-1], fontsize=15, fontproperties=font_prop, color='white', ha='center')
-        ax4.text(0.5, y_pos - 0.05, f'{shots} shots', fontsize=12, fontproperties=font_prop, color=teamcolor, ha='center')
+    
     
     ax4.set_axis_off()
 
