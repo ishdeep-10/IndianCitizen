@@ -818,7 +818,7 @@ def plot_shotmap_understat_team(df_shots,team,league,teamcolor,situation):
 
     st.pyplot(fig)
 
-def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situation):
+def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situation,shotType):
     df1 = df_shots[(df_shots['h_team'] == team) & (df_shots['h_a'] == 'h')]
     df2 = df_shots[(df_shots['a_team'] == team) & (df_shots['h_a'] == 'a')]
     teamdf = pd.concat([df1, df2], ignore_index=True)
@@ -832,40 +832,70 @@ def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situatio
     points_average_distance = df['X'].mean()
     actual_average_distance = 105 - (df['X'] * 1.2).mean()
 
-    ## OpenPlay
-    df_openplay = df[df['situation'] == 'OpenPlay']
-    total_shots_op = df_openplay.shape[0]
-    total_goals_op = df_openplay[df_openplay['result'] == 'Goal'].shape[0]
-    total_xG_op = df_openplay['xG'].sum()
-    xG_per_shot_op = total_xG_op / total_shots_op
+    if situation != None:
+        ## OpenPlay
+        df_openplay = df[df['situation'] == 'OpenPlay']
+        total_shots_op = df_openplay.shape[0]
+        total_goals_op = df_openplay[df_openplay['result'] == 'Goal'].shape[0]
+        total_xG_op = df_openplay['xG'].sum()
+        xG_per_shot_op = total_xG_op / total_shots_op
+    
+        ## FromCorner
+        df_fromcorner = df[df['situation'] == 'FromCorner']
+        total_shots_c = df_fromcorner.shape[0]
+        total_goals_c = df_fromcorner[df_fromcorner['result'] == 'Goal'].shape[0]
+        total_xG_c = df_fromcorner['xG'].sum()
+        xG_per_shot_c = total_xG_c / total_shots_c
+    
+        ## SetPiece
+        df_setpiece = df[df['situation'] == 'SetPiece']
+        total_shots_sp = df_setpiece.shape[0]
+        total_goals_sp = df_setpiece[df_setpiece['result'] == 'Goal'].shape[0]
+        total_xG_sp = df_setpiece['xG'].sum()
+        xG_per_shot_sp = total_xG_sp / total_shots_sp
+    
+        ## DirectFreekick
+        df_freekick = df[df['situation'] == 'DirectFreekick']
+        total_shots_fk = df_freekick.shape[0]
+        total_goals_fk = df_freekick[df_freekick['result'] == 'Goal'].shape[0]
+        total_xG_fk = df_freekick['xG'].sum()
+        xG_per_shot_fk = total_xG_fk / total_shots_fk
+    
+        ## Penalty
+        df_penalty = df[df['situation'] == 'Penalty']
+        total_shots_p = df_penalty.shape[0]
+        total_goals_p = df_penalty[df_penalty['result'] == 'Goal'].shape[0]
+        total_xG_p = df_penalty['xG'].sum()
+        xG_per_shot_p = total_xG_p / total_shots_p
 
-    ## FromCorner
-    df_fromcorner = df[df['situation'] == 'FromCorner']
-    total_shots_c = df_fromcorner.shape[0]
-    total_goals_c = df_fromcorner[df_fromcorner['result'] == 'Goal'].shape[0]
-    total_xG_c = df_fromcorner['xG'].sum()
-    xG_per_shot_c = total_xG_c / total_shots_c
+    if shotType != None:
+        ## RightFoot
+        df_rf = df[df['shotType'] == 'RightFoot']
+        total_shots_rf = df_rf.shape[0]
+        total_goals_rf = df_rf[df_rf['result'] == 'Goal'].shape[0]
+        total_xG_rf = df_rf['xG'].sum()
+        xG_per_shot_rf = total_xG_rf / total_shots_rf
 
-    ## SetPiece
-    df_setpiece = df[df['situation'] == 'SetPiece']
-    total_shots_sp = df_setpiece.shape[0]
-    total_goals_sp = df_setpiece[df_setpiece['result'] == 'Goal'].shape[0]
-    total_xG_sp = df_setpiece['xG'].sum()
-    xG_per_shot_sp = total_xG_sp / total_shots_sp
+        ## LeftFoot
+        df_lf = df[df['shotType'] == 'LeftFoot']
+        total_shots_lf = df_lf.shape[0]
+        total_goals_lf = df_lf[df_lf['result'] == 'Goal'].shape[0]
+        total_xG_lf = df_lf['xG'].sum()
+        xG_per_shot_lf = total_xG_lf / total_shots_lf
 
-    ## DirectFreekick
-    df_freekick = df[df['situation'] == 'DirectFreekick']
-    total_shots_fk = df_freekick.shape[0]
-    total_goals_fk = df_freekick[df_freekick['result'] == 'Goal'].shape[0]
-    total_xG_fk = df_freekick['xG'].sum()
-    xG_per_shot_fk = total_xG_fk / total_shots_fk
+        ## Head
+        df_h = df[df['shotType'] == 'Head']
+        total_shots_h = df_h.shape[0]
+        total_goals_h = df_h[df_h['result'] == 'Goal'].shape[0]
+        total_xG_h = df_h['xG'].sum()
+        xG_per_shot_h = total_xG_h / total_shots_h
 
-    ## Penalty
-    df_penalty = df[df['situation'] == 'Penalty']
-    total_shots_p = df_penalty.shape[0]
-    total_goals_p = df_penalty[df_penalty['result'] == 'Goal'].shape[0]
-    total_xG_p = df_penalty['xG'].sum()
-    xG_per_shot_p = total_xG_p / total_shots_p
+        ## OtherBodyPart
+        df_o = df[df['shotType'] == 'OtherBodyPart']
+        total_shots_o = df_o.shape[0]
+        total_goals_o = df_o[df_o['result'] == 'Goal'].shape[0]
+        total_xG_o = df_o['xG'].sum()
+        xG_per_shot_o = total_xG_o / total_shots_o
 
     
     pitch = VerticalPitch(
@@ -1021,79 +1051,131 @@ def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situatio
     ax2.set_facecolor(background)
     
     pitch.draw(ax=ax2)
-    if situation == "all":
-        for x in df.to_dict(orient='records'):
-            pitch.scatter(
-                x['X'], 
-                x['Y'], 
-                s=400 * x['xG'], 
-                color=teamcolor if x['result'] == 'Goal' else background, 
-                ax=ax2,
-                alpha=.7,
-                linewidth=.8,
-                edgecolor='white'
-            )
-    elif situation == "OpenPlay":
-        for x in df_openplay.to_dict(orient='records'):
-            pitch.scatter(
-                x['X'], 
-                x['Y'], 
-                s=400 * x['xG'], 
-                color=teamcolor if x['result'] == 'Goal' else background, 
-                ax=ax2,
-                alpha=.7,
-                linewidth=.8,
-                edgecolor='white'
-            )
-    elif situation == "FromCorner":
-        for x in df_fromcorner.to_dict(orient='records'):
-            pitch.scatter(
-                x['X'], 
-                x['Y'], 
-                s=400 * x['xG'], 
-                color=teamcolor if x['result'] == 'Goal' else background, 
-                ax=ax2,
-                alpha=.7,
-                linewidth=.8,
-                edgecolor='white'
-            )
-    elif situation == "SetPiece":
-        for x in df_setpiece.to_dict(orient='records'):
-            pitch.scatter(
-                x['X'], 
-                x['Y'], 
-                s=400 * x['xG'], 
-                color=teamcolor if x['result'] == 'Goal' else background, 
-                ax=ax2,
-                alpha=.7,
-                linewidth=.8,
-                edgecolor='white'
-            )
 
-    elif situation == "DirectFreekick":
-        for x in df_freekick.to_dict(orient='records'):
-            pitch.scatter(
-                x['X'], 
-                x['Y'], 
-                s=400 * x['xG'], 
-                color=teamcolor if x['result'] == 'Goal' else background, 
-                ax=ax2,
-                alpha=.7,
-                linewidth=.8,
-                edgecolor='white'
-            )
-    elif situation == "Penalty":
-        for x in df_penalty.to_dict(orient='records'):
-            pitch.scatter(
-                x['X'], 
-                x['Y'], 
-                s=400 * x['xG'], 
-                color=teamcolor if x['result'] == 'Goal' else background, 
-                ax=ax2,
-                alpha=.7,
-                linewidth=.8,
-                edgecolor='white'
-            )
+    if situation != None:
+        if situation == "all":
+            for x in df.to_dict(orient='records'):
+                pitch.scatter(
+                    x['X'], 
+                    x['Y'], 
+                    s=400 * x['xG'], 
+                    color=teamcolor if x['result'] == 'Goal' else background, 
+                    ax=ax2,
+                    alpha=.7,
+                    linewidth=.8,
+                    edgecolor='white'
+                )
+        elif situation == "OpenPlay":
+            for x in df_openplay.to_dict(orient='records'):
+                pitch.scatter(
+                    x['X'], 
+                    x['Y'], 
+                    s=400 * x['xG'], 
+                    color=teamcolor if x['result'] == 'Goal' else background, 
+                    ax=ax2,
+                    alpha=.7,
+                    linewidth=.8,
+                    edgecolor='white'
+                )
+        elif situation == "FromCorner":
+            for x in df_fromcorner.to_dict(orient='records'):
+                pitch.scatter(
+                    x['X'], 
+                    x['Y'], 
+                    s=400 * x['xG'], 
+                    color=teamcolor if x['result'] == 'Goal' else background, 
+                    ax=ax2,
+                    alpha=.7,
+                    linewidth=.8,
+                    edgecolor='white'
+                )
+        elif situation == "SetPiece":
+            for x in df_setpiece.to_dict(orient='records'):
+                pitch.scatter(
+                    x['X'], 
+                    x['Y'], 
+                    s=400 * x['xG'], 
+                    color=teamcolor if x['result'] == 'Goal' else background, 
+                    ax=ax2,
+                    alpha=.7,
+                    linewidth=.8,
+                    edgecolor='white'
+                )
+    
+        elif situation == "DirectFreekick":
+            for x in df_freekick.to_dict(orient='records'):
+                pitch.scatter(
+                    x['X'], 
+                    x['Y'], 
+                    s=400 * x['xG'], 
+                    color=teamcolor if x['result'] == 'Goal' else background, 
+                    ax=ax2,
+                    alpha=.7,
+                    linewidth=.8,
+                    edgecolor='white'
+                )
+        elif situation == "Penalty":
+            for x in df_penalty.to_dict(orient='records'):
+                pitch.scatter(
+                    x['X'], 
+                    x['Y'], 
+                    s=400 * x['xG'], 
+                    color=teamcolor if x['result'] == 'Goal' else background, 
+                    ax=ax2,
+                    alpha=.7,
+                    linewidth=.8,
+                    edgecolor='white'
+                )
+
+    if shotType != None:
+        if shotType == "RightFoot":
+            for x in df_rf.to_dict(orient='records'):
+                pitch.scatter(
+                    x['X'], 
+                    x['Y'], 
+                    s=400 * x['xG'], 
+                    color=teamcolor if x['result'] == 'Goal' else background, 
+                    ax=ax2,
+                    alpha=.7,
+                    linewidth=.8,
+                    edgecolor='white'
+                )
+        elif shotType == "LeftFoot":
+            for x in df_lf.to_dict(orient='records'):
+                pitch.scatter(
+                    x['X'], 
+                    x['Y'], 
+                    s=400 * x['xG'], 
+                    color=teamcolor if x['result'] == 'Goal' else background, 
+                    ax=ax2,
+                    alpha=.7,
+                    linewidth=.8,
+                    edgecolor='white'
+                )
+        elif shotType == "Head":
+            for x in df_h.to_dict(orient='records'):
+                pitch.scatter(
+                    x['X'], 
+                    x['Y'], 
+                    s=400 * x['xG'], 
+                    color=teamcolor if x['result'] == 'Goal' else background, 
+                    ax=ax2,
+                    alpha=.7,
+                    linewidth=.8,
+                    edgecolor='white'
+                )
+        elif shotType == "Other":
+            for x in df_o.to_dict(orient='records'):
+                pitch.scatter(
+                    x['X'], 
+                    x['Y'], 
+                    s=400 * x['xG'], 
+                    color=teamcolor if x['result'] == 'Goal' else background, 
+                    ax=ax2,
+                    alpha=.7,
+                    linewidth=.8,
+                    edgecolor='white'
+                )
         
     ax2.set_axis_off()
     
@@ -1113,19 +1195,35 @@ def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situatio
         color='white', 
         ha='left'
     )
+    shots_text = ''
+    goals_text = ''
+    xG_text = 0
+    xG_per_shot_text = 0
+    if situation != None:
+        if situation == 'OpenPlay':
+            shots_text = total_shots_op
+        elif situation == 'FromCorner':
+            shots_text = total_shots_c
+        elif situation == 'SetPiece':
+            shots_text = total_shots_sp
+        elif situation == 'DirectFreekick':
+            shots_text = total_shots_fk
+        elif situation == 'Penalty':
+            shots_text = total_shots_p
+        else:
+            shots_text = total_shots
 
-    if situation == 'OpenPlay':
-        shots_text = total_shots_op
-    elif situation == 'FromCorner':
-        shots_text = total_shots_c
-    elif situation == 'SetPiece':
-        shots_text = total_shots_sp
-    elif situation == 'DirectFreekick':
-        shots_text = total_shots_fk
-    elif situation == 'Penalty':
-        shots_text = total_shots_p
-    else:
-        shots_text = total_shots
+    if shotType != None:
+        if shotType == 'RightFoot':
+            shots_text = total_shots_rf
+        elif shotType == 'LeftFoot':
+            shots_text = total_shots_lf
+        elif shotType == 'Head':
+            shots_text = total_shots_h
+        elif shotType == 'Others':
+            shots_text = total_shots_o
+        else:
+            shots_text = total_shots
     
     ax3.text(
         x=0.25, 
@@ -1148,18 +1246,32 @@ def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situatio
         ha='left'
     )
 
-    if situation == 'OpenPlay':
-        goals_text = total_goals_op
-    elif situation == 'FromCorner':
-        goals_text = total_goals_c
-    elif situation == 'SetPiece':
-        goals_text = total_goals_sp
-    elif situation == 'DirectFreekick':
-        goals_text = total_goals_fk
-    elif situation == 'Penalty':
-        goals_text = total_goals_p
-    else:
-        goals_text = total_goals
+    if situation != None:
+        if situation == 'OpenPlay':
+            goals_text = total_goals_op
+        elif situation == 'FromCorner':
+            goals_text = total_goals_c
+        elif situation == 'SetPiece':
+            goals_text = total_goals_sp
+        elif situation == 'DirectFreekick':
+            goals_text = total_goals_fk
+        elif situation == 'Penalty':
+            goals_text = total_goals_p
+        else:
+            goals_text = total_goals
+
+    if shotType != None:
+        if shotType == 'RightFoot':
+            goals_text = total_goals_rf
+        elif shotType == 'LeftFoot':
+            goals_text = total_goals_lf
+        elif shotType == 'Head':
+            goals_text = total_goals_h
+        elif shotType == 'Others':
+            goals_text = total_goals_o
+        else:
+            goals_text = total_goals
+    
     ax3.text(
         x=0.38, 
         y=0, 
@@ -1181,18 +1293,31 @@ def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situatio
         ha='left'
     )
 
-    if situation == 'OpenPlay':
-        xG_text = total_xG_op
-    elif situation == 'FromCorner':
-        xG_text = total_xG_c
-    elif situation == 'SetPiece':
-        xG_text = total_xG_sp
-    elif situation == 'DirectFreekick':
-        xG_text = total_xG_fk
-    elif situation == 'Penalty':
-        xG_text = total_xG_p
-    else:
-        xG_text = total_xG
+    if situation != None:
+        if situation == 'OpenPlay':
+            xG_text = total_xG_op
+        elif situation == 'FromCorner':
+            xG_text = total_xG_c
+        elif situation == 'SetPiece':
+            xG_text = total_xG_sp
+        elif situation == 'DirectFreekick':
+            xG_text = total_xG_fk
+        elif situation == 'Penalty':
+            xG_text = total_xG_p
+        else:
+            xG_text = total_xG
+
+    if shotType != None:
+        if shotType == 'RightFoot':
+            xG_text = total_xG_rf
+        elif shotType == 'LeftFoot':
+            xG_text = total_xG_lf
+        elif shotType == 'Head':
+            xG_text = total_xG_h
+        elif shotType == 'Others':
+            xG_text = total_xG_o
+        else:
+            xG_text = total_xG
     ax3.text(
         x=0.53, 
         y=0, 
@@ -1214,18 +1339,31 @@ def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situatio
         ha='left'
     )
 
-    if situation == 'OpenPlay':
-        xG_per_shot_text = xG_per_shot_op
-    elif situation == 'FromCorner':
-        xG_per_shot_text = xG_per_shot_c
-    elif situation == 'SetPiece':
-        xG_per_shot_text = xG_per_shot_sp
-    elif situation == 'DirectFreekick':
-        xG_per_shot_text = xG_per_shot_fk
-    elif situation == 'Penalty':
-        xG_per_shot_text = xG_per_shot_p
-    else:
-        xG_per_shot_text = xG_per_shot
+    if situation != None:
+        if situation == 'OpenPlay':
+            xG_per_shot_text = xG_per_shot_op
+        elif situation == 'FromCorner':
+            xG_per_shot_text = xG_per_shot_c
+        elif situation == 'SetPiece':
+            xG_per_shot_text = xG_per_shot_sp
+        elif situation == 'DirectFreekick':
+            xG_per_shot_text = xG_per_shot_fk
+        elif situation == 'Penalty':
+            xG_per_shot_text = xG_per_shot_p
+        else:
+            xG_per_shot_text = xG_per_shot
+
+    if shotType != None:
+        if shotType == 'RightFoot':
+            xG_per_shot_text = xG_per_shot_rf
+        elif shotType == 'LeftFoot':
+            xG_per_shot_text = xG_per_shot_lf
+        elif shotType == 'Head':
+            xG_per_shot_text = xG_per_shot_h
+        elif shotType == 'Others':
+            xG_per_shot_text = xG_per_shot_o
+        else:
+            xG_per_shot = xG_per_shot
     
     ax3.text(
         x=0.63, 
@@ -1238,11 +1376,12 @@ def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situatio
     )
 
     ax3.set_axis_off()
+
     st.pyplot(fig)
 
 def plot_shotmap_understat_conceded(df,team,league,teamcolor,situation):
-    df11 = df[((df['h_team'] == team) & (df['h_a'] == 'a'))]
-    df21 = df[((df['a_team'] == team) & (df['h_a'] == 'h'))]
+    df11 = df[((df['h_team'] == team) & (df['h_a'] == 'a')) & (df['result'] != 'OwnGoal')]
+    df21 = df[((df['a_team'] == team) & (df['h_a'] == 'h')) & (df['result'] != 'OwnGoal')]
     df1 = pd.concat([df11, df21], ignore_index=True)
 
     df12 = df[((df['h_team'] == team) & (df['h_a'] == 'h')) & (df['result'] == 'OwnGoal')]
@@ -1682,7 +1821,7 @@ elif league == "La Liga":
 elif league == "Bundesliga":
     df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Bundesliga/2024-25/shot_data.csv')
 elif league == "SerieA":
-    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Seria_A/2024-25/shot_data.csv')
+    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Serie_A/2024-25/shot_data.csv')
 elif league == "Ligue1":
     df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Ligue_1/2024-25/shot_data.csv')
 
@@ -1747,35 +1886,58 @@ elif viz == 'Team ShotMap - Shots Conceded':
         if st.button("Penalty"):
             situation = "Penalty"
     plot_shotmap_understat_conceded(df, team,league, color[0],situation)
-    
+
 elif viz == 'Player ShotMap':
     df1 = df[(df['h_team'] == team) & (df['h_a'] == 'h')]
     df2 = df[(df['a_team'] == team) & (df['h_a'] == 'a')]
     team_df = pd.concat([df1, df2], ignore_index=True) 
     player = st.selectbox('Select Player',team_df['player'].sort_values().unique(),index=0)
+    filtertype = st.selectbox('Select Filter Type',['Shot Situation','Shot Type'],index=0)
     situation = "all"
-    # Create 5 columns for the buttons
-    col1, col2, col3, col4, col5 = st.columns(5)
+    shotType = None
+    if filtertype == 'Shot Situation':
+        # Create 5 columns for the buttons
+        col1, col2, col3, col4, col5 = st.columns(5)
 
-    # Add buttons in each column
-    with col1:
-        if st.button("OpenPlay"):
-            situation = "OpenPlay"
+        # Add buttons in each column
+        with col1:
+            if st.button("OpenPlay"):
+                situation = "OpenPlay"
 
-    with col2:
-        if st.button("FromCorner"):
-            situation = "FromCorner"
+        with col2:
+            if st.button("FromCorner"):
+                situation = "FromCorner"
 
-    with col3:
-        if st.button("SetPiece"):
-            situation = "SetPiece"
+        with col3:
+            if st.button("SetPiece"):
+                situation = "SetPiece"
 
-    with col4:
-        if st.button("DirectFreekick"):
-            situation = "DirectFreekick"
+        with col4:
+            if st.button("DirectFreekick"):
+                situation = "DirectFreekick"
 
-    with col5:
-        if st.button("Penalty"):
-            situation = "Penalty"
-    plot_shotmap_understat_player(df, team,league, color[0],player,situation)
+        with col5:
+            if st.button("Penalty"):
+                situation = "Penalty"
+        plot_shotmap_understat_player(df, team,league, color[0],player,situation,shotType=None)
+    elif filtertype == 'Shot Type':
+        col1, col2, col3, col4 = st.columns(4)
+
+        # Add buttons in each column
+        with col1:
+            if st.button("RightFoot"):
+                shotType = "RightFoot"
+
+        with col2:
+            if st.button("LeftFoot"):
+                shotType = "LeftFoot"
+
+        with col3:
+            if st.button("Head"):
+                shotType = "Head"
+
+        with col4:
+            if st.button("Others"):
+                shotType = "Others"
+        plot_shotmap_understat_player(df, team,league, color[0],player,situation=None,shotType=shotType)
 
