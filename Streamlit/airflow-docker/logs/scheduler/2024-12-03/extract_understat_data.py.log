@@ -1,0 +1,42 @@
+[2024-12-03T11:55:19.215+0000] {processor.py:186} INFO - Started process (PID=2453) to work on /opt/airflow/dags/extract_understat_data.py
+[2024-12-03T11:55:19.216+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/extract_understat_data.py for tasks to queue
+[2024-12-03T11:55:19.219+0000] {logging_mixin.py:190} INFO - [2024-12-03T11:55:19.219+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/extract_understat_data.py
+[2024-12-03T11:55:19.251+0000] {logging_mixin.py:190} INFO - [2024-12-03T11:55:19.246+0000] {dagbag.py:387} ERROR - Failed to import: /opt/airflow/dags/extract_understat_data.py
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/dagbag.py", line 383, in parse
+    loader.exec_module(new_module)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/opt/airflow/dags/extract_understat_data.py", line 5, in <module>
+    import papermill as pm
+ModuleNotFoundError: No module named 'papermill'
+[2024-12-03T11:55:19.253+0000] {processor.py:927} WARNING - No viable dags retrieved from /opt/airflow/dags/extract_understat_data.py
+[2024-12-03T11:55:20.113+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/extract_understat_data.py took 0.905 seconds
+[2024-12-03T11:55:51.049+0000] {processor.py:186} INFO - Started process (PID=2517) to work on /opt/airflow/dags/extract_understat_data.py
+[2024-12-03T11:55:51.050+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/extract_understat_data.py for tasks to queue
+[2024-12-03T11:55:51.053+0000] {logging_mixin.py:190} INFO - [2024-12-03T11:55:51.053+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/extract_understat_data.py
+[2024-12-03T11:55:51.078+0000] {logging_mixin.py:190} INFO - [2024-12-03T11:55:51.073+0000] {dagbag.py:387} ERROR - Failed to import: /opt/airflow/dags/extract_understat_data.py
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/dagbag.py", line 383, in parse
+    loader.exec_module(new_module)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/opt/airflow/dags/extract_understat_data.py", line 5, in <module>
+    import papermill as pm
+ModuleNotFoundError: No module named 'papermill'
+[2024-12-03T11:55:51.079+0000] {processor.py:927} WARNING - No viable dags retrieved from /opt/airflow/dags/extract_understat_data.py
+[2024-12-03T11:55:51.144+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/extract_understat_data.py took 0.104 seconds
+[2024-12-03T11:56:22.011+0000] {processor.py:186} INFO - Started process (PID=2581) to work on /opt/airflow/dags/extract_understat_data.py
+[2024-12-03T11:56:22.013+0000] {processor.py:914} INFO - Processing file /opt/airflow/dags/extract_understat_data.py for tasks to queue
+[2024-12-03T11:56:22.015+0000] {logging_mixin.py:190} INFO - [2024-12-03T11:56:22.015+0000] {dagbag.py:588} INFO - Filling up the DagBag from /opt/airflow/dags/extract_understat_data.py
+[2024-12-03T11:56:22.037+0000] {logging_mixin.py:190} INFO - [2024-12-03T11:56:22.032+0000] {dagbag.py:387} ERROR - Failed to import: /opt/airflow/dags/extract_understat_data.py
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.12/site-packages/airflow/models/dagbag.py", line 383, in parse
+    loader.exec_module(new_module)
+  File "<frozen importlib._bootstrap_external>", line 995, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/opt/airflow/dags/extract_understat_data.py", line 5, in <module>
+    import papermill as pm
+ModuleNotFoundError: No module named 'papermill'
+[2024-12-03T11:56:22.039+0000] {processor.py:927} WARNING - No viable dags retrieved from /opt/airflow/dags/extract_understat_data.py
+[2024-12-03T11:56:22.089+0000] {processor.py:208} INFO - Processing /opt/airflow/dags/extract_understat_data.py took 0.085 seconds
