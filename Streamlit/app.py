@@ -18,6 +18,7 @@ import matplotlib.image as mpimg
 import matplotlib.patches as patches
 import soccerdata as sd
 from unidecode import unidecode
+import psycopg2
 
 font_path = r'C:\Users\acer\Documents\GitHub\IndianCitizen\ScorePredict\Score Logos-20241022T100701Z-001\Score Logos\Sora_Font\Sora-Regular.ttf'
 font_prop = fm.FontProperties(fname=font_path)
@@ -1811,19 +1812,52 @@ def plot_shotmap_understat_conceded(df,team,league,teamcolor,situation):
 st.title("Indian Citizen")
 st.subheader("Football Analytics App")
 
+# Database connection parameters
+host = "localhost"
+port = "5432"
+database = "understat_shots_db"
+user = "ichadha"
+password = "ichadhapg"
+
+# Connect to PostgreSQL
+try:
+    conn = psycopg2.connect(
+        host=host, port=port, database=database, user=user, password=password
+    )
+    st.success("Connected to PostgreSQL database!")
+except Exception as e:
+    st.error(f"Error connecting to the database: {e}")
+
+
+season = st.selectbox('Select Season',[2024,2023,2022,2021,2020,2019,2018,2017,2016,2015,2014],index=0)
 
 league = st.selectbox('Select League',['Premier League','La Liga','Bundesliga','SerieA','Ligue1'],index=0)
 
-if league == "Premier League":
-    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/EPL/2024-25/shot_data.csv')
-elif league == "La Liga":
-    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/La_Liga/2024-25/shot_data.csv')
-elif league == "Bundesliga":
-    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Bundesliga/2024-25/shot_data.csv')
-elif league == "SerieA":
-    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Serie_A/2024-25/shot_data.csv')
-elif league == "Ligue1":
-    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Ligue_1/2024-25/shot_data.csv')
+league_mapping = {
+    'Premier League': 'EPL',
+    'La Liga': 'La_Liga',
+    'Bundesliga': 'Bundesliga',
+    'SerieA': 'Serie_A',
+    'Ligue1': 'Ligue_1'
+}
+
+# Get the mapped league value
+db_league = league_mapping.get(league, league)
+
+
+query = f"SELECT * FROM understat_shots_tb where league = '{db_league}' and season = {season};"
+df = pd.read_sql(query, conn)
+
+#if league == "Premier League":
+#    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/EPL/2024-25/shot_data.csv')
+#elif league == "La Liga":
+#    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/La_Liga/2024-25/shot_data.csv')
+#elif league == "Bundesliga":
+#    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Bundesliga/2024-25/shot_data.csv')
+#elif league == "SerieA":
+#    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Serie_A/2024-25/shot_data.csv')
+#elif league == "Ligue1":
+#    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Ligue_1/2024-25/shot_data.csv')
 
 
 team = st.selectbox('Select Team',df['h_team'].sort_values().unique(),index=0)
