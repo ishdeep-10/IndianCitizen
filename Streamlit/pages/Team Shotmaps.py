@@ -325,7 +325,7 @@ def plot_shotmap_fotmob(df,team,teamcolor):
     return fig
 
 
-def plot_shotmap_understat_team(df_shots,team,league,teamcolor,situation):
+def plot_shotmap_understat_team(df_shots,team,league,teamcolor,situation,season):
     df1 = df_shots[(df_shots['h_team'] == team) & (df_shots['h_a'] == 'h') & (df_shots['result'] != 'OwnGoal')]
     df2 = df_shots[(df_shots['a_team'] == team) & (df_shots['h_a'] == 'a') & (df_shots['result'] != 'OwnGoal')]
     df = pd.concat([df1, df2], ignore_index=True)
@@ -441,7 +441,7 @@ def plot_shotmap_understat_team(df_shots,team,league,teamcolor,situation):
     ax1.text(
         x=0.5, 
         y=.7, 
-        s=f'All shots in the {league} 2024-25', 
+        s=f'All shots in the {league} {season}', 
         fontsize=16,
         fontweight='bold',
         fontproperties=font_prop, 
@@ -819,7 +819,7 @@ def plot_shotmap_understat_team(df_shots,team,league,teamcolor,situation):
 
     st.pyplot(fig)
 
-def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situation,shotType):
+def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,season,situation,shotType):
     df1 = df_shots[(df_shots['h_team'] == team) & (df_shots['h_a'] == 'h')]
     df2 = df_shots[(df_shots['a_team'] == team) & (df_shots['h_a'] == 'a')]
     teamdf = pd.concat([df1, df2], ignore_index=True)
@@ -936,7 +936,7 @@ def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situatio
     ax1.text(
         x=0.5, 
         y=.7, 
-        s=f'All shots in the {league} 2024-25', 
+        s=f'All shots in the {league} {season}', 
         fontsize=14,
         fontweight='bold',
         fontproperties=font_prop, 
@@ -1380,7 +1380,7 @@ def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,situatio
 
     st.pyplot(fig)
 
-def plot_shotmap_understat_conceded(df,team,league,teamcolor,situation):
+def plot_shotmap_understat_conceded(df,team,league,teamcolor,situation,season):
     df11 = df[((df['h_team'] == team) & (df['h_a'] == 'a')) & (df['result'] != 'OwnGoal')]
     df21 = df[((df['a_team'] == team) & (df['h_a'] == 'h')) & (df['result'] != 'OwnGoal')]
     df1 = pd.concat([df11, df21], ignore_index=True)
@@ -1471,7 +1471,7 @@ def plot_shotmap_understat_conceded(df,team,league,teamcolor,situation):
     ax1.text(
         x=0.5, 
         y=.7, 
-        s=f'All shots conceded in the {league} 2024-25', 
+        s=f'All shots conceded in the {league} {season}', 
         fontsize=14,
         fontweight='bold',
         fontproperties=font_prop, 
@@ -1809,8 +1809,8 @@ def plot_shotmap_understat_conceded(df,team,league,teamcolor,situation):
     st.pyplot(fig)
 
 
-st.title("Indian Citizen")
-st.subheader("Football Analytics App")
+st.title("Team ShotMaps")
+st.subheader("Analysizing Shots Taken From Last 10 Seasons Across Top 5 Leagues")
 
 # Database connection parameters
 host = "localhost"
@@ -1861,117 +1861,37 @@ df = pd.read_sql(query, conn)
 
 
 team = st.selectbox('Select Team',df['h_team'].sort_values().unique(),index=0)
-viz = st.selectbox('Select Viz Type',['Team ShotMap - Shots Attempted','Team ShotMap - Shots Conceded','Player ShotMap'],index=0)
+#viz = st.selectbox('Select Viz Type',['Team ShotMap - Shots Attempted','Team ShotMap - Shots Conceded','Player ShotMap'],index=0)
 
 number_of_colors = 1
 color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
              for i in range(number_of_colors)]
 
-if viz == 'Team ShotMap - Shots Attempted':
-    situation = "all"
-    # Create 5 columns for the buttons
-    col1, col2, col3, col4, col5 = st.columns(5)
+#if viz == 'Team ShotMap - Shots Attempted':
+situation = "all"
+# Create 5 columns for the buttons
+col1, col2, col3, col4, col5 = st.columns(5)
 
-    # Add buttons in each column
-    with col1:
-        if st.button("OpenPlay"):
-            situation = "OpenPlay"
+# Add buttons in each column
+with col1:
+    if st.button("OpenPlay"):
+        situation = "OpenPlay"
 
-    with col2:
-        if st.button("FromCorner"):
-            situation = "FromCorner"
+with col2:
+    if st.button("FromCorner"):
+        situation = "FromCorner"
 
-    with col3:
-        if st.button("SetPiece"):
-            situation = "SetPiece"
+with col3:
+    if st.button("SetPiece"):
+        situation = "SetPiece"
 
-    with col4:
-        if st.button("DirectFreekick"):
-            situation = "DirectFreekick"
+with col4:
+    if st.button("DirectFreekick"):
+        situation = "DirectFreekick"
 
-    with col5:
-        if st.button("Penalty"):
-            situation = "Penalty"
-    
-    plot_shotmap_understat_team(df, team,league, color[0],situation)
-elif viz == 'Team ShotMap - Shots Conceded':
-    situation = "all"
-    # Create 5 columns for the buttons
-    col1, col2, col3, col4, col5 = st.columns(5)
+with col5:
+    if st.button("Penalty"):
+        situation = "Penalty"
 
-    # Add buttons in each column
-    with col1:
-        if st.button("OpenPlay"):
-            situation = "OpenPlay"
-
-    with col2:
-        if st.button("FromCorner"):
-            situation = "FromCorner"
-
-    with col3:
-        if st.button("SetPiece"):
-            situation = "SetPiece"
-
-    with col4:
-        if st.button("DirectFreekick"):
-            situation = "DirectFreekick"
-
-    with col5:
-        if st.button("Penalty"):
-            situation = "Penalty"
-    plot_shotmap_understat_conceded(df, team,league, color[0],situation)
-
-elif viz == 'Player ShotMap':
-    df1 = df[(df['h_team'] == team) & (df['h_a'] == 'h')]
-    df2 = df[(df['a_team'] == team) & (df['h_a'] == 'a')]
-    team_df = pd.concat([df1, df2], ignore_index=True) 
-    player = st.selectbox('Select Player',team_df['player'].sort_values().unique(),index=0)
-    filtertype = st.selectbox('Select Filter Type',['Shot Situation','Shot Type'],index=0)
-    situation = "all"
-    shotType = None
-    if filtertype == 'Shot Situation':
-        # Create 5 columns for the buttons
-        col1, col2, col3, col4, col5 = st.columns(5)
-
-        # Add buttons in each column
-        with col1:
-            if st.button("OpenPlay"):
-                situation = "OpenPlay"
-
-        with col2:
-            if st.button("FromCorner"):
-                situation = "FromCorner"
-
-        with col3:
-            if st.button("SetPiece"):
-                situation = "SetPiece"
-
-        with col4:
-            if st.button("DirectFreekick"):
-                situation = "DirectFreekick"
-
-        with col5:
-            if st.button("Penalty"):
-                situation = "Penalty"
-        plot_shotmap_understat_player(df, team,league, color[0],player,situation,shotType=None)
-    elif filtertype == 'Shot Type':
-        col1, col2, col3, col4 = st.columns(4)
-
-        # Add buttons in each column
-        with col1:
-            if st.button("RightFoot"):
-                shotType = "RightFoot"
-
-        with col2:
-            if st.button("LeftFoot"):
-                shotType = "LeftFoot"
-
-        with col3:
-            if st.button("Head"):
-                shotType = "Head"
-
-        with col4:
-            if st.button("Others"):
-                shotType = "Others"
-        plot_shotmap_understat_player(df, team,league, color[0],player,situation=None,shotType=shotType)
+plot_shotmap_understat_team(df, team,league, color[0],situation,season)
 
