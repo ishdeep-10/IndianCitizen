@@ -1848,18 +1848,6 @@ db_league = league_mapping.get(league, league)
 query = f"SELECT * FROM understat_shots_tb where league = '{db_league}' and season = {season};"
 df = pd.read_sql(query, conn)
 
-#if league == "Premier League":
-#    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/EPL/2024-25/shot_data.csv')
-#elif league == "La Liga":
-#    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/La_Liga/2024-25/shot_data.csv')
-#elif league == "Bundesliga":
-#    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Bundesliga/2024-25/shot_data.csv')
-#elif league == "SerieA":
-#    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Serie_A/2024-25/shot_data.csv')
-#elif league == "Ligue1":
-#    df = pd.read_csv('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Data/Ligue_1/2024-25/shot_data.csv')
-
-
 team = st.selectbox('Select Team',df['h_team'].sort_values().unique(),index=0)
 #viz = st.selectbox('Select Viz Type',['Team ShotMap - Shots Attempted','Team ShotMap - Shots Conceded','Player ShotMap'],index=0)
 
