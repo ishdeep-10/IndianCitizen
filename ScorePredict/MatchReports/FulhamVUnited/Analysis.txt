@@ -1,0 +1,32 @@
+1-
+The opening match of this premier league season was replayed this week at Craven Cottage and ironically produced the same result as the previous one with United grabbing a win with just one late goal.
+
+Although United deserved the win in the previous encounter with producing much better numbers on the pitch, this time many would say they that Amorim's team got lucky with a deflected shot from Lisandro Martinez from 30 yards out looping over Fulham's goalkeeper to grab the three points against a team who has been in very decent form.
+
+With very little chances created from either team, Fulham had still 9 shots as compared to only 4 from United and 2 shots on target with a total xG of just 0.56. However, Amorim's problems still seems to persist with his attackers not producing enough chances as he would have liked them to with only a 0.2 xG produced throughout the 90 mins.
+
+
+
+2-
+The odds for United winning this game were certainly low before the game started with respect to Fulham's recent performances where they have managed to atleast score 1 goal in their last 5 games.
+United had just one effort in a forgettable first half where a couple of Alex Iwobi stingers were all Fulham had to show for their endeavours.
+Out of the total 0.2xG secured by United, 0.18 was resulted from this one shot that too from De Ligt (a center back) from a set piece.
+Fulham attempted 5 shots with a total xG of 0.24 in the first half out of which 2 shots were on target. But nothing noteworthy which would have troubled Onana.
+
+Bruno Fernandes stuck a low free-kick into the side-netting as the second half followed a similar pattern until Martinez tried his luck from range and saw his attempt cruelly loop over Leno via Lukic.
+Fulham, in fairness, had created little themselves, though, until Joachim Andersen saw a thumping header stunningly cleared off the line by substitute Toby Collyer in the closing stages.
+
+3-
+xT Momentum Flow chart represents the Expected Threat (xT) progression throughout the match, highlighting each team's attacking momentum over time. The xT metric quantifies the likelihood of a possession sequence leading to a shot or a dangerous chance.
+Fulham had greater attacking momentum for significant periods, particularly in the first 30 minutes and the last 20 minutes of the game.
+Manchester United had short bursts of attacking pressure, mostly around the 45th and 75th-minute marks, but struggled to maintain prolonged control.
+The goal (marked in red at ~75th minute) coincides with a momentary rise in Manchester United’s xT before Fulham regained control.
+This suggests that United converted a rare attacking sequence into a goal, rather than sustained attacking play leading to multiple high-xT opportunities.
+
+4-
+One of the players which showed his impact on this overall dull game was certainly United's Harry Maguire who has been playing a crucial role in United's recent fixtures as most fans believe that they are seeing his strongest performances for the devils.
+
+Against Fulham too he was like a brick wall which did not break through from tremendous pressure from Fulham's attacks.
+He was very decisive on when to step up the pitch and follow his man to make tackles and recover the ball. His aerial presence to win important duels was once again displayed at the Cottage. With 6 clearances and 3/3 interceptions he read the opposition's danger in his penalty box very swiftly.
+
+One of the key positives for Amorim in a otherwise horrendous start is that his key defender has finally found his form back and now has kept a clean sheet too which they needed desperately.
