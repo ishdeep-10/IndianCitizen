@@ -1,0 +1,45 @@
+1-
+
+Manchester City:
+Took 16 shots but failed to score.
+13 shots on target but with an xG of 0.63, suggesting they struggled to create high-quality chances.
+xGOT (Expected Goals on Target) of 0.41 indicates poor shot placement.
+
+Liverpool:
+Took only 8 shots but scored 2 goals.
+6 shots on target, with a significantly higher xGOT of 1.42, indicating clinical finishing and better shot placement.
+
+Manchester City dominated possession-heavy areas (blue regions), while Liverpool was stronger in defensive and central areas (red zones).
+Manchester City (blue) had sustained attacking momentum throughout the match.
+Liverpool (red) had fewer attacking phases but capitalized on their chances efficiently.
+
+2-
+Manchester City dominated possession and had structured attacking play with high passing accuracy. Liverpool, in contrast, adopted a more direct and efficient approach, relying on long balls and counter-attacks. Despite City's control, Liverpool's fewer but more decisive attacking entries suggest they prioritized efficiency over quantity.
+
+Manchester City:
+691 passes with 617 accurate (89%), indicating dominant ball possession.
+Their passing network shows structured, short passing combinations, with midfielders (such as #82 and #47) heavily involved in ball circulation.
+
+Attack distribution was balanced: 37% left, 32% center, 32% right, showing diverse attacking patterns.
+
+Liverpool:
+Completed 351 passes with 281 accurate (80%), much lower than City's.
+Their passing network is less connected, relying on longer balls and quick transitions rather than sustained possession.
+Entered the final third 21 times (14 by pass, 7 by carry).
+Heavily relied on the right flank (43%), likely exploiting defensive weaknesses in that area.
+
+
+3-
+Manchester City dominated possession and pressing, recovering the ball quickly and maintaining control in attacking areas.
+Liverpool defended deep and relied on counter-attacks, with fewer defensive actions in advanced areas but more duels and tackles in their own half.
+City’s pressing was intense and structured, whereas Liverpool allowed City to have the ball and only pressed selectively.
+Liverpool’s defensive strategy paid off, as they absorbed pressure and took their limited attacking opportunities efficiently.
+
+4-
+
+Liverpool's defensive performance is what made them stand out today showing how to defend as a team specially the three central players in the heart of that defense who blocked everything that City threw at them.
+Both the CBs were perfectly placed at each attack from City to intercept or clear the danger out of their penalty box and the CDM (Gravenberch) who made some very important ball recoveries in zone 14 to start the transitions from defense to attack.
+
+5-
+
+City's best player was probably Jeremy Doku who had Trent on his feet for the whole game with 13 successful dribbles out of 19 attempted. But he lacked efficiency in his final pass and was not able to feed his other attackers into the penalty box to create any shots.

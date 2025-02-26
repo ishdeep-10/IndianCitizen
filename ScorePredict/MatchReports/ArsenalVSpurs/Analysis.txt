@@ -1,0 +1,102 @@
+1-
+North London Derby at the Emirates is always a fixture all premier league fans are really excited for because of the intensity with which both teams step onto the pitch on.
+Midweek match between the two sides who although being very far from each other in the PL table still was a clash of equals as each team loves to grab the bragging rights to be called the best team in London.
+Arsenal however grabbed these rights this time at their home with a convincing win of 2-1 over their city rivals.
+Although both teams had comparable possession over the 90 mins, Arsenal looked much more threatening on the ball with being superior in all attacking stats. With accumulating a sum of 1.45 xG with 14 shots , Arsenal should have scored more than 2 goals considering their chances whereas Spurs with a xG of 0.78 with 11 shots looked like they were not having their best day in the final third.
+Arsenal were much more dominant in terms of passing number too with completing 357 out of their 426 passes attempted as compared to 314/375 from Spurs. An interesting number here is that out of their total passes, Arsenal had 230 passes in the opposition half which is more than double from that of Spurs (109) as a result of which they had 48 touches in the Spurs's opposition box which was again double to that of Spurs (21).
+
+2-
+The flow of the match in terms of expected threat values was dominated by Arsenal almost throughout the game with Spurs having some surges in between for a couple of mins.
+Arsenal had 63% possession in the first half with 4 shots attempted with a cumulative G of 0.3 , surprisingly Spurs having much less possession had a xG of 0.33 with total of 2 shots. And moreover Spurs also scored the first goal against the run of play, hurting Arsenal in their own strengths when Son scored in the 25th minute resulting from a Corner which was poorly cleared out and hit by the Spurs captain which was deflected and rolled into the bottom corner.
+However this didn't hamper Arsenal's attacking threat much as they continued to grow into the game and scored after 15 minutes, with another goal resulting from a Corner met by Gabriel who has already scored many goals for the Gunners in this season. Although this goal was awarded as an Own Goal by Solanke, it was a well worked corner routine with a deep cross slotted in to the far post sending everyone in the wrong direction.
+Arsenal doubled their lead shortly after at the 44th minute , when Partey dispossessed Bissouma with a perfect tackle high up the pitch which was collected by Odegaard and quickly played out wide to Trossard who took a great touch and placed the ball powerfully from a tight angle into the corner which erupted the Emirates as Arsenal got their deserved lead.
+The game opened up a little bit more in the second half as Spurs tried to score the equalizer as a result of which Arsenal got several oppurtunities to increase their lead on the counter attacks but both teams failed to convert any of their chances.
+
+3-
+Passing Networks:
+Arsenal Passing Network:
+Odegaard (No. 8) is central to Arsenal's network, with the highest number of passes both sent (64) and received (52). This highlights his role as a pivotal playmaker.
+His link with Havertz (3 key passes to him) also stands out.
+The network is densely connected around the midfield, indicating heavy reliance on short, controlled passes.
+Key passes (passes leading to scoring opportunities) and xT (expected threat) values reinforce Odegaard's importance.
+Tottenham Passing Network:
+Gray (No. 6) was the most frequent passer (67 sent, 53 received), suggesting he operates as a primary link in Tottenham's midfield from the back.
+Kulusevski and Gray are key players in Tottenham's buildup, with Gray dominating overall passing and Kulusevski creating 4 key passes.
+Richarlison's highest xT (0.2) showcases his contributions to potential scoring opportunities from the bench.
+
+Passes:
+Arsenal completed 468 passes, slightly outpacing Tottenham's 418. This suggests Arsenal maintained more possession.
+Accurate Passes:
+Arsenal had 378 accurate passes compared to Tottenham's 341. Arsenal's precision highlights their control in possession.
+Long Balls:
+Tottenham completed more long balls (50 vs. Arsenal's 39), reflecting a likely strategy of bypassing the midfield for quicker transitions.
+Crosses:
+Both teams attempted a similar number of crosses (Arsenal 12, Tottenham 13), indicating comparable use of width in attack.
+Passes into the Penalty Box:
+Tottenham leads slightly with 19 compared to Arsenal's 7, pointing to a more aggressive intent in the final third.
+
+4-
+Arsenal's Dominance:
+Defensive Third (Left Side):
+Arsenal dominated their defensive areas, especially on the left side near their box, winning most duels. This suggests strong defensive work, with players recovering possession and breaking up Tottenham's attacks effectively.
+Midfield (Central and Left):
+Arsenal controlled central and left midfield zones, which reflects their ability to disrupt Tottenham’s transitions and maintain midfield dominance.
+Final Third (Left):
+In attacking areas, Arsenal dominated and had significant activity on the left wing. This indicates a focus on exploiting the left flank for offensive plays.
+
+Spurs struggled to get hold of the ball in any area of the pitch as they were getting dispossessed at important areas of the pitch and not able hurt Arsenal with their intricate passing through the middle as we have seen them in previous matches.
+Djed Spence although was the only player who looked very lively down the left flank for Spurs and was able to go forward and create chances for his runners up forward at several occasions.
+
+5-
+In terms of final third entries, Arsenal was much more frequent and diverse than Spurs which translates into why they were able to create much more chances.
+
+Saliba was pretty impressive having one of the most passes into the final third out of anyone else with 16 passes and 8 long balls attempted showcasing his ability on the ball and direct approach to serve his wingers down at the wings. For Spurs, it was Porro who was able to deliver passes (6) into the final third from the right hand side.
+
+In terms of carries into the final third, Arsenal were much more successful with most of their carries originating from the midfield by either Odegard or Rice directly into the penalty area. Spurs were once again unsuccessful in carrying the ball into Arsenal's defensive areas.
+
+6-
+Aerial Duels (x):
+
+Both teams recorded 22 aerial duels each, showing a balanced contest in the air.
+Both Saliba(4) and Gabriel(3), the CB pairing for Arsenal, won 100% of their aerial duels however their counterparts Dragusin and Gray won only 2/6 and 1/1 of their aerial duels
+
+Ball Recoveries (o):
+
+Arsenal leads slightly with 38 ball recoveries, compared to Tottenham’s 34.
+This indicates Arsenal's effective regaining of possession, particularly in defensive and midfield areas specially on the right hand flank.
+
+Challenges (^):
+
+Tottenham leads with 9 challenges, while Arsenal has 6.
+This suggests Tottenham was more active in attempting to disrupt Arsenal's play through direct challenges.
+
+Interceptions (+):
+
+Arsenal recorded 9 interceptions, compared to Tottenham’s .
+Arsenal higher interceptions highlight their ability to anticipate and cut out Arsenal's passing lanes, especially in offensive zones. The youngster Lewis Kelly was specially impressive in reading danger and nullyfing it on Arsenal's left hand flank.
+
+Tackles (*):
+
+Arsenal leads slightly with 21 tackles, compared to Tottenham’s 19.
+Arsenal’s higher tackle count, particularly in defensive areas, underscores their aggressive approach to regain possession.
+
+
+The higher number of ball recoveries reflects Arsenal’s focus on regaining possession and transitioning quickly into attack.
+Tottenham's defensive actions are concentrated in deeper areas, especially in their penalty box, highlighting a reactive and compact defensive approach.
+
+Arsenal:
+
+Most Interceptions: Timber (4).
+Most Ball Recoveries: Lewis-Skelly (6).
+Most Tackles: Lewis-Skelly (2).
+Tottenham:
+
+Most Interceptions: Spence (4).
+Most Ball Recoveries: Spence (6).
+Most Tackles: Spence (2).
+
+7-
+The player in focus who was monumental to Arsenal's dominance was the Norway international Martin Odegaard.
+He had the most Key Passes (4) out of anyone else in important areas which led to shot creating actions and also had 74 touches only behind Gray (78) on the right hand side of Arsenal's midfield which shows how Arsenal was successful in finding their playmaker throughout the game. Receiving 54 passes too signifies how well he combined with his winger making in behind runs and also helping out his defenders to receive ball in tight areas and keeping possession.
+He also received 2 key passes out of which he was able to strike 2 shots out of which he should have scored atleast one which would have certainly made his complete performance fruitful.
+P.S. As per official stats he grabbed an assist for Trossard's goal however as it was not intentional opta data didn't record that pass as an assist.

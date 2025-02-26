@@ -1,0 +1,14 @@
+1. xG Flow & Shot Analysis
+Leverkusen (red) had significantly higher cumulative xG (~2.61), while Bayern struggled to create quality chances (xG ~0.01).
+Shot count: Leverkusen had 15 shots, whereas Bayern had only 2, with Leverkusen having only 2 on target and Bayern having none.
+2. Possession & Passing Accuracy
+Leverkusen dominated possession with 56%, while Bayern had 44%.
+Leverkusen also had a higher pass accuracy (83%) compared to Bayern (80%).
+3. Average Positions & Defensive Actions
+Leverkusen’s positioning indicates a compact midfield and aggressive forward play, pressing Bayern higher up the pitch.
+Bayern’s structure seems deeper, suggesting a more defensive or counter-attacking approach.
+Defensive heatmaps show Leverkusen actively pressing in midfield, while Bayern’s defensive actions are scattered across their half.
+4. Pass Maps & Momentum Flow
+Leverkusen's pass map shows structured play through the left and central channels.
+Bayern’s pass map appears more fragmented, indicating a struggle to progress play effectively.
+The xT (Expected Threat) Momentum Flow heavily favors Leverkusen, indicating they had more dangerous attacking phases.

@@ -1,0 +1,84 @@
+1-
+The city of Milan witnessed another derby yesterday between the two rivals out of which the red side would be much more happy of the result than the blue. AC Milan who are struggling to make top 4 this season carved a draw against a team who is going for the title.
+As the shot stats suggest, Inter should have scored more goals in the match with much better chances throughout the 90 mins.
+Out of their 17 total shots, Inter had 12 shots from inside the box with three shots hitting the same goal post creating an xg of 2 with an xGOT of 1.7. Inter were much more dominant in possession too with 544/595 accurate passes compared to 305/360 from Milan.
+And 44 touches in opposition box compared to only 18.
+However Milan showed their defensive resilience who won more ground and aerial duels than Inter and Milan's keeper had a wonderful game creating 5 essential saves to keep his team in the lead for the longest time.
+
+2-
+Neither team created much in the first 30 mins with attempting 11 shots in total with an xg of 0.65 from Milan and 0.43 from Inter. Possession was comparable too 41-59
+However it was Milan who broke the deadlock from a point black thumping finish from Reijnders resulted from an impressive run from Leao from the left wing.
+Milan's shots had much more probability to be resulted in a goal in terms of saving the shot as they had an xGOT of 0.98 in the first half.
+
+Inter were producing much more end results from their time on the ball with attempting 10 shots, double to that from Milan with 4 of them on target with an xg of 0.92 and xGOT of 1.12. Any other day they would have comfortable scored atleast 2 more goals but luck was surely not on their side.
+
+Milan would have thought that they have successfully cleared the danger of conceding even one goal from plethora of chances but Inter left it till the injury time to score the equaliser when De Vrij scored from close range again of a wonderful cross polish substitute Zalewski.
+
+3-
+Inter Milan controlled possession in attacking areas for most of the match, while AC Milan struggled to maintain control, except for brief moments in the middle of the game.
+Field Tilt Analysis
+Inter Milan had a higher field tilt for most of the match, indicating they controlled more of the possession in attacking areas.
+AC Milan had brief moments of control, particularly around the 4th time interval (60-75 minutes), where they had a 63% tilt.
+Inter Milan dominated towards the end of the game, reaching around 90% field tilt, showing complete control in attacking areas.
+
+Pressing Intensity (PPDA) Analysis
+Lower PPDA values mean higher pressing intensity.
+AC Milan started with 6.7 PPDA (moderate pressing) but later increased to 13.3 PPDA (less pressing) between the 30th-45th minute.
+Inter Milan consistently maintained lower PPDA values, pressing intensely throughout.
+Notably, AC Milan's pressing dropped significantly in the 5th interval (75-90 minutes) with a PPDA of 16.1, indicating fatigue or tactical shifts.
+
+Inter Milan applied more defensive pressure throughout the match, while AC Milan's pressing intensity dropped significantly in the latter stages, possibly contributing to their loss of possession control.
+
+4-
+
+Most passes were from Walker (55) and to Walker (49), indicating a central role in their build-up.
+Pulisic and Reijnders were the main creative players, delivering and receving the most key passes (3 each).
+Highest expected threat (xT) passes came from Bennacer (0.25), meaning he played the most dangerous passes leading to attacking opportunities.
+
+De Vrij was crucial in ball distribution, with 98 passes played and 90 received, showing a deep-lying playmaker role.
+Thuram had the most key passes (5), actively creating attacking chances.
+Martinez was the main target (4 key passes received), reinforcing his role as the focal point in attack.
+Mkhitaryan had the highest xT (0.29), making him the most influential passer in dangerous areas.
+
+AC Milan played slightly more long balls (44 vs. 41), possibly to bypass Inter’s press.
+Inter attempted more crosses (20 vs. 6) and passes into the penalty area (20 vs. 6), emphasizing their ability to create attacking opportunities.
+
+Inter Milan’s passing network was more structured, with strong connections between defenders, midfielders, and attackers, enabling fluid build-up.
+AC Milan relied more on specific players (Walker, Pulisic, Bennacer) rather than a cohesive team structure, making them more predictable.
+Inter's superior possession and passing accuracy allowed them to dominate play and create more goal-scoring opportunities.
+
+
+5-
+Inter Milan had more defensive actions overall, especially in ball recoveries (41 vs. 30), interceptions (13 vs. 6), and tackles (20 vs. 8).
+Both teams had an equal number of aerial duels (28 each), indicating similar success in aerial battles.
+Inter’s defensive actions are more spread across the pitch, whereas AC Milan’s actions are concentrated around their own penalty box, suggesting they were under more defensive pressure.
+
+AC Milan
+
+Reijnders was the standout defensive player, leading in ball recoveries (5) and tackles (4).
+Camarda made the most interceptions (2), but his numbers were lower compared to Inter’s top defenders.
+AC Milan’s defensive shape suggests they were forced into deeper defensive actions, likely due to Inter’s attacking dominance.
+Inter Milan
+
+Martinez was crucial in defense, with the most interceptions (2) and tackles (3) for his team.
+Thuram led in ball recoveries (7), showing his effectiveness in pressing and regaining possession.
+The spread of defensive actions across the pitch suggests Inter applied higher defensive pressure, winning the ball in more advanced areas.
+
+Inter Milan’s higher defensive engagement across the pitch indicates an aggressive pressing approach, while AC Milan’s deeper defensive actions suggest they were more reactive and under sustained pressure.
+Inter’s ability to recover the ball in advanced areas (Thuram, Martinez) suggests they had better control over transitions and counter-pressing.
+AC Milan’s reliance on Reijnders for defensive actions highlights a lack of defensive balance, as no other player contributed significantly.
+
+
+Tomori - 
+
+Fikayo Tomori was probably the most important player for Milan in terms of defensive contriutions and helping them to keep the clean sheet till injury time. He had the most defensive actions with the highest successful rate out of all players on the pitch.
+And most of his defensive actions were inside his own box including 7 important clearances.
+He was also impressive in following his strikers in the middle of the pitch to recover loose balls and regain possession for the team. Another important action was the tackles he made in dangerous areas.
+
+Barella -
+
+Another midfield masterclass from the Italian maestro, Barella who was pivotal for Inter in possession with 80 touches (second most among all players, behind De Vrij) all around the pitch showing what a box to box midfielder looks like.
+
+With 4 key passes, 3 out of which came from corners showed his ability on set pieces to deliver balls into dangerous areas into the box with a total expected threat of 0.16.
+
+Not only is he important in playing those intricate passes but he is also included in receving passes in tight areas, in between defensive lines to connect play between defense and attack.
