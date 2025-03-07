@@ -1,0 +1,27 @@
+Real Betis outperformed Real Madrid tactically by maximizing their goal-scoring chances while maintaining defensive solidity. Madrid’s possession-heavy approach lacked end product, leading to their 1-2 loss despite controlling play for longer periods.
+
+Real Betis executed their attacking strategy efficiently, creating and converting better chances.
+Real Madrid controlled possession but lacked penetration, as seen in their lower xG and final third entries.
+
+Passing Network
+Real Betis:
+Well-connected play in midfield, with clear emphasis on central build-up.
+Heavy involvement from fullbacks and wingers in advancing the ball.
+Real Madrid:
+Structured possession-based play, using midfielders as key distributors.
+A more balanced approach with wide players also involved in progression.
+
+45 entries, with a mix of passes (36) and carries (9).
+Left side (49%) was more active compared to the right and central areas.
+Real Madrid:
+40 entries, with 32 through passing and 8 from carries.
+More balanced attacking distribution compared to Betis.
+
+Momentum Flow:
+The chart shows Betis dominating early and late phases, while Madrid had control in the middle periods.
+The match had high fluctuation in momentum, with both teams having attacking spells.
+
+Betis:
+Defensive actions spread across the field, showing a balanced pressing strategy.
+Madrid:
+Heavily concentrated in their defensive third, suggesting a deeper defensive shape.

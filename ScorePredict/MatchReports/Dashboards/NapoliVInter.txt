@@ -1,0 +1,21 @@
+Napoli outperformed Inter in chance creation and attacking efficiency, but the final score does not fully reflect their dominance. Inter’s defensive structure and possession-based play helped them resist Napoli’s attacks, but their lack of final third presence led to fewer scoring opportunities.
+
+Passing Network
+Napoli: The passing network shows fluid passing, with high involvement from midfielders and fullbacks in attack.
+Inter: The passing network indicates controlled possession play, with defenders and midfielders dominating ball circulation.
+
+Final Third Entries
+Napoli had 46 final third entries, with a majority through passing rather than dribbling.
+Inter, on the other hand, had only 10 entries, showing struggles in advancing into the attacking zones.
+
+xG Flow & Momentum
+The xG Flow graph shows that Napoli consistently created more chances, with a sharp increase towards the end, leading to a goal by Billing.
+Inter’s only notable xG moment came early in the match through Dimarco who scored a wonderful freekick.
+The Momentum Flow chart indicates Napoli had dominant attacking phases, while Inter had short periods of offensive control.
+
+Defensive Actions
+Both teams show extensive defensive actions, with Inter particularly active in their defensive third.
+Napoli’s defensive actions are spread across the pitch, suggesting a high-pressing approach.
+Duels Won
+Napoli dominated duels in key areas, especially in midfield and wide areas.
+Inter won some duels in defensive zones, showing resilience under pressure.
