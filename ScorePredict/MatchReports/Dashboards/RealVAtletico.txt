@@ -1,0 +1,36 @@
+ShotMap Analysis
+Real Madrid:
+Total Shots: 13
+Goals: 2
+Shots on Target: 7 (High efficiency in hitting the target)
+Expected Goals (xG): 0.68 (Indicates lower-quality shot locations)
+Expected Goals on Target (xGOT): 1.76 (Better shot placement increased goal probability)
+Atletico Madrid:
+Total Shots: 6
+Goals: 1
+Shots on Target: 3
+xG: 0.2 (Low-quality shot chances)
+xGOT: 0.65
+
+Real Madrid had more shot volume and higher efficiency in shot placement compared to Atletico Madrid. Their xGOT suggests they made better use of their chances.
+
+Passing Networks
+Real Madrid: Strong connections in midfield and buildup play, with key players forming triangles in deeper areas.
+Atletico Madrid: More centralized passing with a focus on progressing through a compact midfield.
+Real Madrid had a more structured and fluid buildup, while Atletico relied on a direct approach through central players.
+
+Pressing - 
+Real Madrid applied a high press in certain phases, while Atletico maintained a steady but less aggressive press. 
+
+Final Third Entries-
+Real Madrid dominated attacking entries and varied their approach, while Atletico had fewer and more predictable entries.
+
+xT Momemtum-
+Real Madrid had extended periods of control, while Atletico had shorter bursts of offensive momentum.
+Real Madrid controlled possession and dictated the game's flow for longer periods.
+
+Defensive - 
+Both teams had a low block defending their box out of possession trying to absorb pressure from wide areas and then trying to counter from the back.
+
+Both teams had battles across the midfield, but Real Madrid seemed to edge out in key attacking areas.
+Winning duels in advanced areas helped Real Madrid maintain attacking pressure.
