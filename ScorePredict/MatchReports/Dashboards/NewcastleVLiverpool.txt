@@ -1,0 +1,22 @@
+Newcastle United finally won a major trophy after 50 plus years beating Liverpool in the Carabao Cup Final. An electric match played at Wembley with a fantastic result for the Jordys.
+
+Key points - 
+Newcastle had more attacking presence with 17 total shots, while Liverpool managed 7.
+xG (Expected Goals): Newcastle (1.84) vs. Liverpool (0.89), indicating Newcastle had better goal-scoring opportunities.
+Newcastle had a significantly higher xGOT (Expected Goals on Target) at 3.04 compared to Liverpool’s 0.52, which suggests Newcastle’s shots were of higher quality when on target. 
+
+Dan Burn opened the scorin with a thunderous header from a corner with Isak doubling the lead with a lethal finish inside the penalty box.
+
+Liverpool's Chiesa got a late goal but was not enough to beat Newcastle.
+
+Newcastle’s passing network was more structured, with strong connectivity among players, particularly in central areas.
+Liverpool’s passing network shows reliance on the wide areas.
+
+The Momentum Flow chart indicates Newcastle had better attacking spells, with Liverpool’s goal coming during a brief attacking surge.
+
+Newcastle’s defensive actions are scattered across their half, suggesting an aggressive pressing approach.
+Liverpool’s defensive actions are more concentrated centrally and in their own half
+
+Although Liverpool had more touches in the center of the field, Newcastle's midfield trio of Tonali, Joelinton and Bruno won almost every duel to win back possession.
+
+Newcastle deservedly won the match, creating better chances and executing their attacking strategy effectively. Liverpool struggled to break through Newcastle’s defensive setup, and despite having more final third entries, their lack of shot volume and high-quality chances cost them. Newcastle’s better xG, possession control, and structured play were the decisive factors in their victory.
