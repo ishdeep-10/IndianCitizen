@@ -10,8 +10,8 @@ from datetime import datetime
 
 # Database connection settings (replace with your credentials)
 db_config = {
-    'dbname': 'understat_shots_db',
-    'user': 'ichadha',
+    'dbname': 'understat_db',
+    'user': 'ishdeep',
     'password': 'ichadhapg',
     'host': 'localhost',
     'port': 5432,
