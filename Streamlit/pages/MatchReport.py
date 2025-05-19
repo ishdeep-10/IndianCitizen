@@ -5,6 +5,7 @@ import pandas as pd
 import os,glob
 from st_aggrid import AgGrid
 from st_aggrid.grid_options_builder import GridOptionsBuilder
+import psycopg2
 
 st.title("Match Report")
 
@@ -47,12 +48,18 @@ viz = st.selectbox(
     index=0
 )
 if viz == 'Shot Map':
-    fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(20,22))
+    #fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(20,22))
+    pitch = Pitch(pitch_type='uefa',half=False, corner_arcs=True, pitch_color=background, line_color='white', linewidth=1.5)
+    fig, axs = pitch.jointgrid(figheight=25,grid_width =1, left=None, bottom=0.075, grid_height=0.8,
+                           axis=False,
+                           endnote_height=0, title_height=0)
     fig.set_facecolor('#010b14')
-    summary_df,player_df = shotMap_ws(match_df,axs,fig,home_team,away_team,'blue','red')
+    home_team_col = match_df[match_df['teamName'] == home_team]['teamColor'].unique()[0]
+    away_team_col = match_df[match_df['teamName'] == away_team]['teamColor'].unique()[0]
+    summary_df,player_df = shotMap_ws(match_df,axs,fig,pitch,home_team,away_team,home_team_col,away_team_col)
     #shotMap(match_df,axs[1],away_team,'red')
-    axs.set_xlim(-10, 115)  # example: pitch length from 0 to 120
-    axs.set_ylim(-10, 80)   # example: pitch width from 0 to 80
+    axs['pitch'].set_xlim(-10, 115)  # example: pitch length from 0 to 120
+    axs['pitch'].set_ylim(-10, 80)   # example: pitch width from 0 to 80
     st.pyplot(fig)
     st.dataframe(summary_df, width=1000)
     st.dataframe(player_df, width=1000)
