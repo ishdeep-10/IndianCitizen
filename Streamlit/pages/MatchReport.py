@@ -11,7 +11,7 @@ st.title("Match Report")
 
 league = st.selectbox(
     'Select League',
-    ['Premier League', 'La Liga', 'Bundesliga', 'SerieA', 'Ligue1', 'Champions League'],
+    ['Premier League', 'La Liga', 'Bundesliga', 'SerieA', 'Ligue1', 'Champions League', 'Europa League'],
     index=0
 )
 
@@ -21,7 +21,8 @@ league_mapping = {
     'Bundesliga': 'bundesliga',
     'SerieA': 'serie-a',
     'Ligue1': 'ligue-1',
-    'Champions League': 'champions-league'
+    'Champions League': 'champions-league',
+    'Europa League': 'europa-league'
 }
 
 # Use the mapping directly
@@ -47,16 +48,30 @@ viz = st.selectbox(
     ['Shot Map', 'Passing Network'],
     index=0
 )
+
+theme = st.selectbox(
+    'Select Theme',
+    ['Dark', 'Light'],
+    index=0
+)
+if theme == 'Dark':
+    background = "#051216F7"
+    line_color = 'white'
+    text_color = 'white'
+else:
+    background = "#FFFFFF"
+    line_color = 'black'
+    text_color = 'black'
+
 if viz == 'Shot Map':
     #fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(20,22))
-    pitch = Pitch(pitch_type='uefa',half=False, corner_arcs=True, pitch_color=background, line_color='white', linewidth=1.5)
-    fig, axs = pitch.jointgrid(figheight=25,grid_width =1, left=None, bottom=0.075, grid_height=0.8,
-                           axis=False,
-                           endnote_height=0, title_height=0)
-    fig.set_facecolor('#010b14')
+    pitch = Pitch(pitch_type='uefa',half=False, corner_arcs=True, pitch_color=background, line_color=line_color, linewidth=1.5)
+    fig, axs = pitch.jointgrid(figheight=20,grid_width =1, left=None, bottom=None, grid_height=0.9,
+                           axis=False,title_space=0,endnote_height=0,title_height=0,ax_top=False)
+    fig.set_facecolor(background)
     home_team_col = match_df[match_df['teamName'] == home_team]['teamColor'].unique()[0]
     away_team_col = match_df[match_df['teamName'] == away_team]['teamColor'].unique()[0]
-    summary_df,player_df = shotMap_ws(match_df,axs,fig,pitch,home_team,away_team,home_team_col,away_team_col)
+    summary_df,player_df = shotMap_ws(match_df,axs,fig,pitch,home_team,away_team,home_team_col,away_team_col,text_color,background)
     #shotMap(match_df,axs[1],away_team,'red')
     axs['pitch'].set_xlim(-10, 115)  # example: pitch length from 0 to 120
     axs['pitch'].set_ylim(-10, 80)   # example: pitch width from 0 to 80

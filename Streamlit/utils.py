@@ -203,24 +203,24 @@ def get_team_names(df):
     'Southampton': '#D71920',
     'Bournemouth': '#DA291C',
     'Liverpool': '#C8102E',
-    'Newcastle': '#241F20',
+    'Newcastle': "#F8F5F6",
     'Chelsea': '#034694',
     'Nottingham Forest': '#E53233',
     'West Ham': '#7A263A',
     'Man Utd': '#DA291C',
-    'Fulham': '#000000',
+    'Fulham': "#FFFFFF",
     'Brentford': '#E30613',
     'Crystal Palace': '#1B458F',
     'Everton': '#003399',
     'Ipswich': '#005BAC',
     'Bayern Munich': '#DC052D',
     'Bayer Leverkusen': '#E30613',
-    'Eintracht Frankfurt': '#000000',
+    'Eintracht Frankfurt': "#FFFFFF",
     'Mainz 05': '#C8102E',
-    'Freiburg': '#000000',
+    'Freiburg': "#F9F4F4",
     'RB Leipzig': '#E4002B',
     'Wolfsburg': '#65B32E',
-    'Borussia M.Gladbach': '#000000',
+    'Borussia M.Gladbach': "#EEF3ED",
     'VfB Stuttgart': '#E30613',
     'Borussia Dortmund': '#FDE100',
     'Augsburg': '#C8102E',
@@ -234,13 +234,13 @@ def get_team_names(df):
     'Inter': '#1E2943',
     'Napoli': '#0082CA',
     'Atalanta': '#1C1C1C',
-    'Juventus': '#000000',
+    'Juventus': "#F8F4F4",
     'Lazio': '#A8C6E5',
     'Bologna': '#D4001F',
     'Fiorentina': '#592C82',
     'Roma': '#8E1111',
     'AC Milan': '#FB090B',
-    'Udinese': '#000000',
+    'Udinese': "#F2EBEB",
     'Torino': '#8B1B3A',
     'Genoa': '#C8102E',
     'Como': '#005BAC',
@@ -249,7 +249,7 @@ def get_team_names(df):
     'Lecce': '#FCE500',
     'Parma Calcio': '#FCE500',
     'Empoli': '#005BAC',
-    'Venezia': '#000000',
+    'Venezia': "#F2ECEC",
     'Monza': '#E30613',
     'PSG': '#004170',
     'Marseille': '#009DDC',
@@ -263,7 +263,7 @@ def get_team_names(df):
     'Brest': '#E30613',
     'Rennes': '#E30613',
     'Auxerre': '#005BAC',
-    'Angers': '#000000',
+    'Angers': "#EEECEC",
     'Nantes': '#FCE500',
     'Reims': '#E30613',
     'Le Havre': '#005BAC',
@@ -279,7 +279,7 @@ def get_team_names(df):
     'Go Ahead Eagles': '#E30613',
     'FC Groningen': '#007A33',
     'Fortuna Sittard': '#FCE500',
-    'Heracles': '#000000',
+    'Heracles': "#FAF7F7",
     'SC Heerenveen': '#005BAC',
     'NEC Nijmegen': '#E30613',
     'NAC Breda': '#FCE500',
@@ -2042,21 +2042,32 @@ def match_stats_ws(ax,text_color,df,hteam,ateam,team1_facecolor,team2_facecolor,
     ax.text(78, saves_rect_y + rect_height / 2, str(team2_saves), color = text_color, ha='left', va='center',fontsize=10,fontproperties=font_prop)
 
 def summarize_player_shots(df):
-    # Filter shot types
+    # Filter relevant shot types
     mask_shots = df['type'].isin(['Goal', 'MissedShots', 'SavedShot', 'ShotOnPost'])
     shots_df = df[mask_shots].copy()
 
-    # Summary of shot outcomes
+    # Create new boolean columns
+    shots_df['BlockedShots'] = ((shots_df['type'] == 'SavedShot') & (shots_df['shotBlocked'] == True)).astype(int)
+    shots_df['CleanSavedShot'] = ((shots_df['type'] == 'SavedShot') & (shots_df['shotBlocked'] == False)).astype(int)
+
+    # Summarize main shot types
     player_summary = shots_df.groupby('playerName')['type'].value_counts().unstack(fill_value=0)
     player_summary = player_summary.rename(columns={
         'Goal': 'Goals',
-        'SavedShot': 'On Target',
         'MissedShots': 'Off Target',
-        'ShotOnPost': 'Woodwork'
+        'ShotOnPost': 'Woodwork',
     })
 
-    # Ensure all columns exist
-    for col in ['Goals', 'On Target', 'Off Target', 'Woodwork']:
+    # Add 'On Target' from CleanSavedShot column
+    saved_shots = shots_df.groupby('playerName')['CleanSavedShot'].sum().rename('On Target')
+    player_summary = player_summary.merge(saved_shots, left_index=True, right_index=True, how='left')
+
+    # Add BlockedShots
+    blocked = shots_df.groupby('playerName')['BlockedShots'].sum().rename('BlockedShots')
+    player_summary = player_summary.merge(blocked, left_index=True, right_index=True, how='left')
+
+    # Fill missing columns
+    for col in ['Goals', 'On Target', 'Off Target', 'Woodwork', 'BlockedShots']:
         if col not in player_summary.columns:
             player_summary[col] = 0
 
@@ -2065,26 +2076,32 @@ def summarize_player_shots(df):
         player_summary['Goals'] +
         player_summary['On Target'] +
         player_summary['Off Target'] +
-        player_summary['Woodwork']
+        player_summary['Woodwork'] +
+        player_summary['BlockedShots']
     )
 
-    # Add total xG per player
-    xg_summary = shots_df.groupby('playerName')['xG'].sum().round(3).rename('Total xG')
+    # Add total xG
+    xg_summary = shots_df.groupby('playerName')['xG'].sum().rename('Total xG')
 
-    # Merge with shot summary
+    # Round conditionally
+    xg_summary = xg_summary.apply(lambda x: round(x, 2) if x < 0.9 else round(x, 3))
+
+    # Merge and compute xG/Shot
     player_summary = player_summary.merge(xg_summary, left_index=True, right_index=True)
     player_summary['xG/Shot'] = (player_summary['Total xG'] / player_summary['Total Shots']).round(3)
 
-    # Reset index for display
+    # Reset index
     player_summary = player_summary.reset_index()
 
     # Filter out players with no shots
     player_summary = player_summary[player_summary['Total Shots'] > 0]
 
-    # Sort by total xG (or by Total Shots if you prefer)
+    # Sort by total shots
     player_summary = player_summary.sort_values(by='Total Shots', ascending=False)
 
     return player_summary
+
+
 
 def calculate_angle(x, y,GOAL_X,GOAL_Y):
     goal_width = 7.32
@@ -2099,7 +2116,7 @@ def calculate_angle(x, y,GOAL_X,GOAL_Y):
         angle = 0
     return angle
 
-def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor):
+def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor,text_color,background):
     
     df['x'] = df['x']*1.05
     df['y'] = df['y']*0.68
@@ -2109,7 +2126,7 @@ def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor):
     xgb_model = joblib.load('C://Users//acer//Documents//GitHub//IndianCitizen//ScorePredict//notebooks//xgboost_xg_model.pkl')
 
     # Filter shot events
-    shot_events = ['SavedShot', 'MissedShot', 'ShotOnPost', 'Goal']
+    shot_events = ['SavedShot', 'MissedShots', 'ShotOnPost', 'Goal']
     df = df[df['type'].isin(shot_events)].copy()
 
     # Compute distance
@@ -2144,7 +2161,8 @@ def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor):
     home_shots_df = df[mask1]
     home_shots_df.reset_index(drop=True, inplace=True)
     h_missed = home_shots_df[home_shots_df['type'] == 'MissedShots']
-    h_saved = home_shots_df[home_shots_df['type'] == 'SavedShot']
+    h_saved = home_shots_df[(home_shots_df['type'] == 'SavedShot') & (home_shots_df['shotBlocked'] == False)]
+    h_blocked = home_shots_df[(home_shots_df['type'] == 'SavedShot') & (home_shots_df['shotBlocked'] == True)]
     h_post = home_shots_df[home_shots_df['type'] == 'ShotOnPost']
     h_goals = home_shots_df[(home_shots_df['type'] == 'Goal') & (home_shots_df['goalOwn'] == False)]
     h_own_goals = home_shots_df[(home_shots_df['type'] == 'Goal') & (home_shots_df['goalOwn'] == True)]
@@ -2152,7 +2170,8 @@ def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor):
     away_shots_df = df[mask2]
     away_shots_df.reset_index(drop=True, inplace=True)
     a_missed = away_shots_df[away_shots_df['type'] == 'MissedShots']
-    a_saved = away_shots_df[away_shots_df['type'] == 'SavedShot']
+    a_saved = away_shots_df[(away_shots_df['type'] == 'SavedShot') & (away_shots_df['shotBlocked'] == False)]
+    a_blocked = away_shots_df[(away_shots_df['type'] == 'SavedShot') & (away_shots_df['shotBlocked'] == True)]
     a_post = away_shots_df[away_shots_df['type'] == 'ShotOnPost']
     a_goals = away_shots_df[(away_shots_df['type'] == 'Goal') & (away_shots_df['goalOwn'] == False)]
     a_own_goals = away_shots_df[(away_shots_df['type'] == 'Goal') & (away_shots_df['goalOwn'] == True)]
@@ -2160,72 +2179,85 @@ def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor):
     away_shots_df['x'] = pitch.dim.right - away_shots_df.x
     away_shots_df['y'] = pitch.dim.top - away_shots_df.y
     team1_hist_y = sns.kdeplot(y=away_shots_df.y, ax=axs['left'], color=team2_facecolor, fill=True)
-    team1_hist_x = sns.kdeplot(x=away_shots_df.x, ax=axs['top'], color=team2_facecolor, fill=True)
-    team2_hist_x = sns.kdeplot(x=home_shots_df.x, ax=axs['top'], color=team1_facecolor, fill=True)
+    #team1_hist_x = sns.kdeplot(x=away_shots_df.x, ax=axs['top'], color=team2_facecolor, fill=True)
+    #team2_hist_x = sns.kdeplot(x=home_shots_df.x, ax=axs['top'], color=team1_facecolor, fill=True)
     team2_hist_y = sns.kdeplot(y=home_shots_df.y, ax=axs['right'], color=team1_facecolor, fill=True)
 
     a_missed['x'] = pitch.dim.right - a_missed.x
     a_saved['x'] = pitch.dim.right - a_saved.x
     a_post['x'] = pitch.dim.right - a_post.x
     a_goals['x'] = pitch.dim.right - a_goals.x
+    a_own_goals['x'] = pitch.dim.right - a_own_goals.x
+    a_blocked['x'] = pitch.dim.right - a_blocked.x
 
     a_missed['y'] = pitch.dim.top - a_missed.y
     a_saved['y'] = pitch.dim.top - a_saved.y
     a_post['y'] = pitch.dim.top - a_post.y
     a_goals['y'] = pitch.dim.top - a_goals.y
+    a_own_goals['y'] = pitch.dim.top - a_own_goals.y
+    a_blocked['y'] = pitch.dim.top - a_blocked.y
 
     pitch.scatter(h_missed.x,h_missed.y,marker='o', edgecolors=team1_facecolor, s=5000 * h_missed['xG'], c=background,ax=axs['pitch'])
     pitch.scatter(h_saved.x,h_saved.y,marker='o', edgecolors='white', s=5000 * h_saved['xG'], c=team1_facecolor,zorder=4,ax=axs['pitch'])
     pitch.scatter(h_post.x,h_post.y,marker='o', edgecolors='green', s=5000 * h_post['xG'], c=team1_facecolor,zorder=5,ax=axs['pitch'])
-    pitch.scatter(h_goals.x,h_goals.y,marker='football', edgecolors='#010b14', s=8000 * h_goals['xG'],zorder=6, c=team1_facecolor,ax=axs['pitch'])
+    pitch.scatter(h_goals.x,h_goals.y,marker='football', edgecolors=text_color, s=8000 * h_goals['xG'],zorder=6, c=team1_facecolor,ax=axs['pitch'])
     pitch.scatter(a_own_goals.x,a_own_goals.y,marker='football', edgecolors=team2_facecolor, s=1000,zorder=6, c=team1_facecolor,ax=axs['pitch'])
+    pitch.scatter(h_blocked.x,h_blocked.y,marker='s', edgecolors=text_color, s=3000 * h_blocked['xG'],zorder=6, c=team1_facecolor,ax=axs['pitch'])
+
 
     pitch.scatter(a_missed.x,a_missed.y,marker='o', edgecolors=team2_facecolor, s=5000 * a_missed['xG'], c=background,ax=axs['pitch'])
     pitch.scatter(a_saved.x,a_saved.y,marker='o', edgecolors='white', s=5000 * a_saved['xG'], c=team2_facecolor,zorder=4,ax=axs['pitch'])
     pitch.scatter(a_post.x,a_post.y,marker='o', edgecolors='green', s=5000 * a_post['xG'], c=team2_facecolor,zorder=5,ax=axs['pitch'])
-    pitch.scatter(a_goals.x,a_goals.y,marker='football', edgecolors='#010b14', s=8000 * a_goals['xG'],zorder=6, c=team2_facecolor,ax=axs['pitch'])
+    pitch.scatter(a_goals.x,a_goals.y,marker='football', edgecolors=text_color, s=8000 * a_goals['xG'],zorder=6, c=team2_facecolor,ax=axs['pitch'])
     pitch.scatter(h_own_goals.x,h_own_goals.y,marker='football', edgecolors=team1_facecolor, s=1000,zorder=6, c=team2_facecolor,ax=axs['pitch'])
+    pitch.scatter(a_blocked.x,a_blocked.y,marker='s', edgecolors=text_color, s=3000 * a_blocked['xG'],zorder=6, c=team2_facecolor,ax=axs['pitch'])
 
-    pitch.scatter(4,-5,marker='football', edgecolors='white', s=1000, c=background,ax=axs['pitch'])
-    pitch.annotate('Goal', xy=(10,-5), fontsize=30,color='white',fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
+
+
+    pitch.scatter(4,-5,marker='football', edgecolors=text_color, s=1000, c=background,ax=axs['pitch'])
+    pitch.annotate('Goal', xy=(10,-5), fontsize=30,color=text_color,fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
     
-    pitch.scatter(30,-5,marker='o', edgecolors='white', s=1000, c='white',ax=axs['pitch'])
-    pitch.annotate('On Target', xy=(40,-5), fontsize=30,color='white',fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
+    pitch.scatter(23,-5,marker='o', edgecolors=background, s=1000, c=text_color,ax=axs['pitch'])
+    pitch.annotate('On Target', xy=(33,-5), fontsize=30,color=text_color,fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
 
-    pitch.scatter(55,-5,marker='o', edgecolors='lightgreen', s=1000, c=background,ax=axs['pitch'])
-    pitch.annotate('Woodwork', xy=(65,-5), fontsize=30,color='white',fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
+    pitch.scatter(48,-5,marker='o', edgecolors='green',linewidth=5, s=1000, c=background,ax=axs['pitch'])
+    pitch.annotate('Woodwork', xy=(58,-5), fontsize=30,color=text_color,fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
 
-    pitch.scatter(85,-5,marker='o', edgecolors='white', s=1000, c=background,ax=axs['pitch'])
-    pitch.annotate('Off Target', xy=(93,-5), fontsize=30,color='white',fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
+    pitch.scatter(70,-5,marker='o', edgecolors=text_color, s=1000, c=background,ax=axs['pitch'])
+    pitch.annotate('Off Target', xy=(78,-5), fontsize=30,color=text_color,fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
 
-    pitch.annotate('ShotMap', xy=(10, 75), fontsize=60,color='white',fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
+    pitch.scatter(90,-5,marker='s', edgecolors=text_color,linewidth=3, s=1000, c=background,ax=axs['pitch'])
+    pitch.annotate('Blocked', xy=(98,-5), fontsize=30,color=text_color,fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
+
+    #pitch.annotate('ShotMap', xy=(10, 75), fontsize=60,color='white',fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
 
     logo = mpimg.imread('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Score Logos-20241022T100701Z-001/Score Logos/ScoreSquareWhite.png')
 
     ax_image = add_image(
-        logo, fig, left=0.75, bottom=0.71, width=0.08, height=0.08,aspect='equal'
+        logo, fig, left=0.85, bottom=0.15, width=0.08, height=0.08,aspect='equal'
     )
 
     hteam_img = mpimg.imread(f'C:\\Users\\acer\\Documents\\GitHub\\IndianCitizen\\ScorePredict\\Images\\TeamLogos\\{hteam}.png')
 
     ax_image = add_image(
-        hteam_img, fig, left=0.35, bottom=0.55, width=0.1, height=0.1,aspect='equal'
+        hteam_img, fig, left=0.35, bottom=0.65, width=0.12, height=0.12,aspect='equal'
     )
 
     ateam_img = mpimg.imread(f'C:\\Users\\acer\\Documents\\GitHub\\IndianCitizen\\ScorePredict\\Images\\TeamLogos\\{ateam}.png')
 
     ax_image = add_image(
-        ateam_img, fig, left=0.56, bottom=0.55, width=0.1, height=0.1,aspect='equal'
+        ateam_img, fig, left=0.52, bottom=0.65, width=0.12, height=0.12,aspect='equal'
     )
 
     h_xg = round(home_shots_df['xG'].sum(),2)
     a_xg = round(away_shots_df['xG'].sum(),2)
     summary_data = {
         'Team': [hteam, ateam],
-        'Goals': [len(h_goals), len(a_goals)],
+        'Goals': [len(h_goals) + len(a_own_goals), len(a_goals) + len(h_own_goals)],
         'On Target': [len(h_goals) + len(h_saved), len(a_goals) + len(a_saved)],
         'Off Target': [len(h_missed), len(a_missed)],
         'Woodwork': [len(h_post), len(a_post)],
+        'Blocked': [len(h_blocked), len(a_blocked)],
         'Own Goals': [len(h_own_goals), len(a_own_goals)],
         'xG': [h_xg, a_xg]
     }
