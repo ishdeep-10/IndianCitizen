@@ -21,57 +21,15 @@ from mplsoccer import PyPizza, add_image, FontManager
 import seaborn as sns
 from matplotlib import colormaps
 import joblib
+from unidecode import unidecode
+from scipy.ndimage import gaussian_filter
+
 
 font_path = r'C:\Users\acer\Documents\GitHub\IndianCitizen\ScorePredict\Score Logos-20241022T100701Z-001\Score Logos\Sora_Font\Sora-Regular.ttf'
 font_prop = fm.FontProperties(fname=font_path)
 fm_sora = FontManager()
 
-background='#010b14'
-
-@st.cache_data
-
-def load_data(root_folder):
-    csv_files = glob.glob(os.path.join(root_folder, "**", "*.csv"), recursive=True)
-    dataframes = []
-    for file in csv_files:
-        try:
-            dfi = pd.read_csv(file)
-            dataframes.append(dfi)
-        except Exception as e:
-            st.error(f"Error reading {file}: {e}")
-    if dataframes:
-        df = pd.concat(dataframes, ignore_index=True)
-    else:
-        df = pd.DataFrame()  # empty fallback
-    return df, csv_files
-
-def get_match_df(df, home_team, away_team):
-    # Find matchId(s) where selected home_team was home ('h') AND away_team was away ('a')
-    matching_matches = df[
-        (df['teamName'] == home_team) & (df['h_a'] == 'h')
-    ]['matchId'].unique()
-
-    # Filter further: check that in the same matchId, the away team appears as 'a'
-    valid_match_ids = []
-    for match_id in matching_matches:
-        away_team_rows = df[(df['matchId'] == match_id) & (df['teamName'] == away_team) & (df['h_a'] == 'a')]
-        if not away_team_rows.empty:
-            valid_match_ids.append(match_id)
-
-    if not valid_match_ids:
-        st.warning(f"No match found between {home_team} (home) and {away_team} (away).")
-    else:
-        # Assuming only 1 matchId between them per venue
-        selected_match_id = valid_match_ids[0]
-
-        # Filter df to keep only events from this match
-        match_df = df[df['matchId'] == selected_match_id]
-
-    return match_df
-
-def get_team_names(df):
-    df = df.sort_values(by='matchId')
-    teams_dict = { 
+team_dict = { 
         65: 'Barcelona',
         63: 'Atletico Madrid',
         52: 'Real Madrid',
@@ -172,7 +130,7 @@ def get_team_names(df):
         129 : 'PSV'
     }
     
-    team_colors = {
+team_colors = {
     'Barcelona': '#A50044',
     'Atletico Madrid': '#CE3524',
     'Real Madrid': '#FCBF00',
@@ -290,9 +248,250 @@ def get_team_names(df):
     'Almere City': '#E30613'
     }
 
-    df['teamName'] = df['teamId'].map(teams_dict)
+
+background='#010b14'
+
+@st.cache_data
+
+def load_data(root_folder):
+    csv_files = glob.glob(os.path.join(root_folder, "**", "*.csv"), recursive=True)
+    dataframes = []
+    for file in csv_files:
+        try:
+            dfi = pd.read_csv(file)
+            dataframes.append(dfi)
+        except Exception as e:
+            st.error(f"Error reading {file}: {e}")
+    if dataframes:
+        df = pd.concat(dataframes, ignore_index=True)
+    else:
+        df = pd.DataFrame()  # empty fallback
+    return df, csv_files
+
+def insert_ball_carries(events_df, min_carry_length=3, max_carry_length=60, min_carry_duration=1, max_carry_duration=10):
+    events_out = pd.DataFrame()
+    # Carry conditions (convert from metres to opta)
+    min_carry_length = 3.0
+    max_carry_length = 60.0
+    min_carry_duration = 1.0
+    max_carry_duration = 10.0
+    # match_events = events_df[events_df['match_id'] == match_id].reset_index()
+    match_events = events_df.reset_index()
+    match_carries = pd.DataFrame()
+
+    for idx, match_event in match_events.iterrows():
+
+        if idx < len(match_events) - 1:
+            prev_evt_team = match_event['teamId']
+            next_evt_idx = idx + 1
+            init_next_evt = match_events.loc[next_evt_idx]
+            take_ons = 0
+            incorrect_next_evt = True
+
+            while incorrect_next_evt:
+
+                next_evt = match_events.loc[next_evt_idx]
+
+                if next_evt['type'] == 'TakeOn' and next_evt['outcomeType'] == 'Successful':
+                    take_ons += 1
+                    incorrect_next_evt = True
+
+                elif ((next_evt['type'] == 'TakeOn' and next_evt['outcomeType'] == 'Unsuccessful')
+                      or (next_evt['teamId'] != prev_evt_team and next_evt['type'] == 'Challenge' and next_evt['outcomeType'] == 'Unsuccessful')
+                      or (next_evt['type'] == 'Foul')):
+                    incorrect_next_evt = True
+
+                else:
+                    incorrect_next_evt = False
+
+                next_evt_idx += 1
+
+            # Apply some conditioning to determine whether carry criteria is satisfied
+            same_team = prev_evt_team == next_evt['teamId']
+            not_ball_touch = match_event['type'] != 'BallTouch'
+            dx = 105*(match_event['endX'] - next_evt['x'])/100
+            dy = 68*(match_event['endY'] - next_evt['y'])/100
+            far_enough = dx ** 2 + dy ** 2 >= min_carry_length ** 2
+            not_too_far = dx ** 2 + dy ** 2 <= max_carry_length ** 2
+            dt = 60 * (next_evt['cumulative_mins'] - match_event['cumulative_mins'])
+            min_time = dt >= min_carry_duration
+            same_phase = dt < max_carry_duration
+            same_period = match_event['period'] == next_evt['period']
+
+            valid_carry = same_team & not_ball_touch & far_enough & not_too_far & min_time & same_phase &same_period
+
+            if valid_carry:
+                carry = pd.DataFrame()
+                prev = match_event
+                nex = next_evt
+
+                carry.loc[0, 'eventId'] = prev['eventId'] + 0.5
+                carry['minute'] = np.floor(((init_next_evt['minute'] * 60 + init_next_evt['second']) + (
+                        prev['minute'] * 60 + prev['second'])) / (2 * 60))
+                carry['second'] = (((init_next_evt['minute'] * 60 + init_next_evt['second']) +
+                                    (prev['minute'] * 60 + prev['second'])) / 2) - (carry['minute'] * 60)
+                carry['teamId'] = nex['teamId']
+                carry['x'] = prev['endX']
+                carry['y'] = prev['endY']
+                carry['expandedMinute'] = np.floor(((init_next_evt['expandedMinute'] * 60 + init_next_evt['second']) +
+                                                    (prev['expandedMinute'] * 60 + prev['second'])) / (2 * 60))
+                carry['period'] = nex['period']
+                carry['type'] = carry.apply(lambda x: {'value': 99, 'displayName': 'Carry'}, axis=1)
+                carry['outcomeType'] = 'Successful'
+                carry['qualifiers'] = carry.apply(lambda x: {'type': {'value': 999, 'displayName': 'takeOns'}, 'value': str(take_ons)}, axis=1)
+                carry['satisfiedEventsTypes'] = carry.apply(lambda x: [], axis=1)
+                carry['isTouch'] = True
+                carry['playerId'] = nex['playerId']
+                carry['endX'] = nex['x']
+                carry['endY'] = nex['y']
+                carry['blockedX'] = np.nan
+                carry['blockedY'] = np.nan
+                carry['goalMouthZ'] = np.nan
+                carry['goalMouthY'] = np.nan
+                carry['isShot'] = np.nan
+                carry['relatedEventId'] = nex['eventId']
+                carry['relatedPlayerId'] = np.nan
+                carry['isGoal'] = np.nan
+                carry['cardType'] = np.nan
+                carry['isOwnGoal'] = np.nan
+                carry['type'] = 'Carry'
+                carry['cumulative_mins'] = (prev['cumulative_mins'] + init_next_evt['cumulative_mins']) / 2
+                carry['playerName'] = nex['playerName']
+
+                match_carries = pd.concat([match_carries, carry], ignore_index=True, sort=False)
+
+    match_events_and_carries = pd.concat([match_carries, match_events], ignore_index=True, sort=False)
+    match_events_and_carries = match_events_and_carries.sort_values(['period', 'cumulative_mins']).reset_index(drop=True)
+
+    # Rebuild events dataframe
+    events_out = pd.concat([events_out, match_events_and_carries])
+
+    return events_out
+
+def cumulative_match_mins(events_df):
+    events_out = pd.DataFrame()
+    # Add cumulative time to events data, resetting for each unique match
+    match_events = events_df.copy()
+    match_events['cumulative_mins'] = match_events['minute'] + (1/60) * match_events['second']
+    # Add time increment to cumulative minutes based on period of game.
+    for period in np.arange(1, match_events['period'].max() + 1, 1):
+        if period > 1:
+            t_delta = match_events[match_events['period'] == period - 1]['cumulative_mins'].max() - \
+                                   match_events[match_events['period'] == period]['cumulative_mins'].min()
+        elif period == 1 or period == 5:
+            t_delta = 0
+        else:
+            t_delta = 0
+        match_events.loc[match_events['period'] == period, 'cumulative_mins'] += t_delta
+    # Rebuild events dataframe
+    events_out = pd.concat([events_out, match_events])
+    return events_out
+
+def get_match_df(df, home_team, away_team,team_dict,team_colors):
+    # Find matchId(s) where selected home_team was home ('h') AND away_team was away ('a')
+    matching_matches = df[
+        (df['teamName'] == home_team) & (df['h_a'] == 'h')
+    ]['matchId'].unique()
+
+    # Filter further: check that in the same matchId, the away team appears as 'a'
+    valid_match_ids = []
+    for match_id in matching_matches:
+        away_team_rows = df[(df['matchId'] == match_id) & (df['teamName'] == away_team) & (df['h_a'] == 'a')]
+        if not away_team_rows.empty:
+            valid_match_ids.append(match_id)
+
+    if not valid_match_ids:
+        st.warning(f"No match found between {home_team} (home) and {away_team} (away).")
+    else:
+        # Assuming only 1 matchId between them per venue
+        selected_match_id = valid_match_ids[0]
+
+        # Filter df to keep only events from this match
+        match_df = df[df['matchId'] == selected_match_id]
+
+        match_df['period'] = match_df['period'].replace({'FirstHalf': 1, 'SecondHalf': 2, 'FirstPeriodOfExtraTime': 3, 'SecondPeriodOfExtraTime': 4,
+                                     'PenaltyShootout': 5, 'PostGame': 14, 'PreMatch': 16})
+        match_df = cumulative_match_mins(match_df)
+        match_df = insert_ball_carries(match_df, min_carry_length=15, max_carry_length=60, min_carry_duration=4, max_carry_duration=10)
+        match_df = match_df.reset_index(drop=True)
+        match_df['index'] = range(1, len(match_df) + 1)
+        match_df = match_df[['index'] + [col for col in match_df.columns if col != 'index']]
+
+        df_base  = match_df
+        dfxT = df_base.copy()
+        dfxT['qualifiers'] = dfxT['qualifiers'].astype(str)
+        dfxT = dfxT[(~dfxT['qualifiers'].str.contains('Corner'))]
+        dfxT = dfxT[(dfxT['type'].isin(['Pass', 'Carry'])) & (dfxT['outcomeType']=='Successful')]
+
+
+        xT = pd.read_csv('https://raw.githubusercontent.com/mckayjohns/youtube-videos/main/data/xT_Grid.csv', header=None) # use this if you don't have your own xT value Grid
+        # xT = pd.read_csv("/content/xT_Grid.csv", header=None)    # use this if you have your own xT value Grid, then place your file path here
+        xT = np.array(xT)
+        xT_rows, xT_cols = xT.shape
+
+        dfxT['x1_bin_xT'] = pd.cut(dfxT['x'], bins=xT_cols, labels=False)
+        dfxT['y1_bin_xT'] = pd.cut(dfxT['y'], bins=xT_rows, labels=False)
+        dfxT['x2_bin_xT'] = pd.cut(dfxT['endX'], bins=xT_cols, labels=False)
+        dfxT['y2_bin_xT'] = pd.cut(dfxT['endY'], bins=xT_rows, labels=False)
+
+        dfxT['start_zone_value_xT'] = dfxT[['x1_bin_xT', 'y1_bin_xT']].apply(lambda x: xT[x[1]][x[0]], axis=1)
+        dfxT['end_zone_value_xT'] = dfxT[['x2_bin_xT', 'y2_bin_xT']].apply(lambda x: xT[x[1]][x[0]], axis=1)
+
+        dfxT['xT'] = dfxT['end_zone_value_xT'] - dfxT['start_zone_value_xT']
+        columns_to_drop = ['eventId', 'minute', 'second', 'teamId', 'x', 'y', 'expandedMinute', 'period', 'type', 'outcomeType', 'qualifiers', 'satisfiedEventsTypes', 'isTouch', 'playerId', 'endX', 'endY', 'blockedX', 'blockedY', 'goalMouthZ', 'goalMouthY', 'isShot', 'relatedEventId', 'relatedPlayerId', 'isGoal', 'cardType', 'isOwnGoal', 'cumulative_mins', 'Unnamed: 0', 'id', 'h_a', 'matchId', 'startDate', 'startTime', 'score', 'ftScore', 'htScore', 'etScore', 'venueName', 'maxMinute', 'playerName', 'shotBodyType', 'situation', 'shotSixYardBox', 'shotPenaltyArea', 'shotOboxTotal', 'shotOpenPlay', 'shotCounter', 'shotSetPiece', 'shotDirectCorner', 'shotOffTarget', 'shotOnPost', 'shotOnTarget', 'shotsTotal', 'shotBlocked', 'shotRightFoot', 'shotLeftFoot', 'shotHead', 'shotObp', 'goalSixYardBox', 'goalPenaltyArea', 'goalObox', 'goalOpenPlay', 'goalCounter', 'goalSetPiece', 'penaltyScored', 'goalOwn', 'goalNormal', 'goalRightFoot', 'goalLeftFoot', 'goalHead', 'goalObp', 'shortPassInaccurate', 'shortPassAccurate', 'passCorner', 'passCornerAccurate', 'passCornerInaccurate', 'passFreekick', 'passBack', 'passForward', 'passLeft', 'passRight', 'keyPassLong', 'keyPassShort', 'keyPassCross', 'keyPassCorner', 'keyPassThroughball', 'keyPassFreekick', 'keyPassThrowin', 'keyPassOther', 'assistCross', 'assistCorner', 'assistThroughball', 'assistFreekick', 'assistThrowin', 'assistOther', 'dribbleLost', 'dribbleWon', 'challengeLost', 'interceptionWon', 'clearanceHead', 'outfielderBlock', 'passCrossBlockedDefensive', 'outfielderBlockedPass', 'offsideGiven', 'offsideProvoked', 'foulGiven', 'foulCommitted', 'yellowCard', 'voidYellowCard', 'secondYellow', 'redCard', 'turnover', 'dispossessed', 'saveLowLeft', 'saveHighLeft', 'saveLowCentre', 'saveHighCentre', 'saveLowRight', 'saveHighRight', 'saveHands', 'saveFeet', 'saveObp', 'saveSixYardBox', 'savePenaltyArea', 'saveObox', 'keeperDivingSave', 'standingSave', 'closeMissHigh', 'closeMissHighLeft', 'closeMissHighRight', 'closeMissLeft', 'closeMissRight', 'shotOffTargetInsideBox', 'touches', 'assist', 'ballRecovery', 'clearanceEffective', 'clearanceTotal', 'clearanceOffTheLine', 'dribbleLastman', 'errorLeadsToGoal', 'errorLeadsToShot', 'intentionalAssist', 'interceptionAll', 'interceptionIntheBox', 'keeperClaimHighLost', 'keeperClaimHighWon', 'keeperClaimLost', 'keeperClaimWon', 'keeperOneToOneWon', 'parriedDanger', 'parriedSafe', 'collected', 'keeperPenaltySaved', 'keeperSaveInTheBox', 'keeperSaveTotal', 'keeperSmother', 'keeperSweeperLost', 'keeperMissed', 'passAccurate', 'passBackZoneInaccurate', 'passForwardZoneAccurate', 'passInaccurate', 'passAccuracy', 'cornerAwarded', 'passKey', 'passChipped', 'passCrossAccurate', 'passCrossInaccurate', 'passLongBallAccurate', 'passLongBallInaccurate', 'passThroughBallAccurate', 'passThroughBallInaccurate', 'passThroughBallInacurate', 'passFreekickAccurate', 'passFreekickInaccurate', 'penaltyConceded', 'penaltyMissed', 'penaltyWon', 'passRightFoot', 'passLeftFoot', 'passHead', 'sixYardBlock', 'tackleLastMan', 'tackleLost', 'tackleWon', 'cleanSheetGK', 'cleanSheetDL', 'cleanSheetDC', 'cleanSheetDR', 'cleanSheetDML', 'cleanSheetDMC', 'cleanSheetDMR', 'cleanSheetML', 'cleanSheetMC', 'cleanSheetMR', 'cleanSheetAML', 'cleanSheetAMC', 'cleanSheetAMR', 'cleanSheetFWL', 'cleanSheetFW', 'cleanSheetFWR', 'cleanSheetSub', 'goalConcededByTeamGK', 'goalConcededByTeamDL', 'goalConcededByTeamDC', 'goalConcededByTeamDR', 'goalConcededByTeamDML', 'goalConcededByTeamDMC', 'goalConcededByTeamDMR', 'goalConcededByTeamML', 'goalConcededByTeamMC', 'goalConcededByTeamMR', 'goalConcededByTeamAML', 'goalConcededByTeamAMC', 'goalConcededByTeamAMR', 'goalConcededByTeamFWL', 'goalConcededByTeamFW', 'goalConcededByTeamFWR', 'goalConcededByTeamSub', 'goalConcededOutsideBoxGoalkeeper', 'goalScoredByTeamGK', 'goalScoredByTeamDL', 'goalScoredByTeamDC', 'goalScoredByTeamDR', 'goalScoredByTeamDML', 'goalScoredByTeamDMC', 'goalScoredByTeamDMR', 'goalScoredByTeamML', 'goalScoredByTeamMC', 'goalScoredByTeamMR', 'goalScoredByTeamAML', 'goalScoredByTeamAMC', 'goalScoredByTeamAMR', 'goalScoredByTeamFWL', 'goalScoredByTeamFW', 'goalScoredByTeamFWR', 'goalScoredByTeamSub', 'aerialSuccess', 'duelAerialWon', 'duelAerialLost', 'offensiveDuel', 'defensiveDuel', 'bigChanceMissed', 'bigChanceScored', 'bigChanceCreated', 'overrun', 'successfulFinalThirdPasses', 'punches', 'penaltyShootoutScored', 'penaltyShootoutMissedOffTarget', 'penaltyShootoutSaved', 'penaltyShootoutSavedGK', 'penaltyShootoutConcededGK', 'throwIn', 'subOn', 'subOff', 'defensiveThird', 'midThird', 'finalThird', 'pos']
+        dfxT.drop(columns=columns_to_drop, inplace=True)
+
+        match_df = match_df.merge(dfxT, on='index', how='left')
+
+        match_df['x'] = match_df['x']*1.05
+        match_df['y'] = match_df['y']*0.68
+        match_df['endX'] = match_df['endX']*1.05
+        match_df['endY'] = match_df['endY']*0.68
+        match_df['goalMouthY'] = match_df['goalMouthY']*0.68
+
+        match_df['qualifiers'] = match_df['qualifiers'].astype(str)
+        # Calculating passing distance, to find out progressive pass, this will just show the distance reduced by a pass, then will be able to filter passes which has reduced distance value more than 10yds as a progressive pass
+        match_df['prog_pass'] = np.where((match_df['type'] == 'Pass'),
+                                np.sqrt((105 - match_df['x'])**2 + (34 - match_df['y'])**2) - np.sqrt((105 - match_df['endX'])**2 + (34 - match_df['endY'])**2), 0)
+        # Calculating carrying distance, to find out progressive carry, this will just show the distance reduced by a carry, then will be able to filter carries which has reduced distance value more than 10yds as a progressive carry
+        match_df['prog_carry'] = np.where((match_df['type'] == 'Carry'),
+                                    np.sqrt((105 - match_df['x'])**2 + (34 - match_df['y'])**2) - np.sqrt((105 - match_df['endX'])**2 + (34 - match_df['endY'])**2), 0)
+        match_df['pass_or_carry_angle'] = np.degrees(np.arctan2(match_df['endY'] - match_df['y'], match_df['endX'] - match_df['x']))
+
+        columns_to_drop2 = ['id']
+        match_df.drop(columns=columns_to_drop2, inplace=True)
+
+        match_df['period'] = match_df['period'].replace({1: 'FirstHalf', 2: 'SecondHalf', 3: 'FirstPeriodOfExtraTime', 4: 'SecondPeriodOfExtraTime',
+                                            5: 'PenaltyShootout', 14: 'PostGame', 16: 'PreMatch'})
+
+        match_df['teamName'] = match_df['teamId'].map(team_dict)
+        match_df['teamColor'] = match_df['teamName'].map(team_colors)
+        match_df = match_df.sort_values(by='index').reset_index(drop=True)
+
+        match_df['event_time'] = match_df['minute'] * 60 + match_df['second']
+
+        # Get first sub time per team
+        first_sub_times = match_df[match_df['type'] == 'SubstitutionOn'] \
+            .groupby('teamName')['event_time'].min().to_dict()
+
+        # Set isFirstEleven default
+        def is_first_eleven(row):
+            team = row['teamName']
+            t = row['event_time']
+            return t < first_sub_times.get(team, float('inf'))
+
+        match_df['isFirstEleven'] = match_df.apply(is_first_eleven, axis=1)
+
+        # Force all SubstitutionOn players to False
+        match_df.loc[match_df['type'] == 'SubstitutionOn', 'isFirstEleven'] = False
+
+    return match_df
+
+def get_team_names(df,team_dict,team_colors):
+    df = df.sort_values(by='matchId')
+    df['teamName'] = df['teamId'].map(team_dict)
     df['teamColor'] = df['teamName'].map(team_colors)
-    team_names = list(teams_dict.values())
+    team_names = list(team_dict.values())
     return df,df['teamName'].unique()
 
 def plot_shotmap_understat_player(df_shots,team,league,teamcolor,player,season,situation,shotType):
@@ -1778,269 +1977,6 @@ def plot_shotmap_understat_team(df_shots,team,league,teamcolor,situation,season)
 
     st.pyplot(fig)
 
-def match_stats_ws(ax,text_color,df,hteam,ateam,team1_facecolor,team2_facecolor,team1_pos,team2_pos,team1_acc_passes,team2_acc_passes,team1_saves,team2_saves,xg1,xg2):
-    
-    team1_xg = xg1
-    team2_xg = xg2
-
-    mask1 = ((df['teamName'] == hteam)) & ((df['type'] == 'Goal') | (df['type'] == 'MissedShots') | (df['type'] == 'SavedShot') | (df['type'] == 'ShotOnPost'))
-    
-    hshots_df = df[mask1]
-    hshots_df.reset_index(drop=True, inplace=True)
-    hmissed = hshots_df[hshots_df['type'] == 'MissedShots']
-    hsaved = hshots_df[hshots_df['type'] == 'SavedShot']
-    hpost = hshots_df[hshots_df['type'] == 'ShotOnPost']
-    hgoals = hshots_df[hshots_df['type'] == 'Goal']
-
-    mask2 = ((df['teamName'] == ateam)) & ((df['type'] == 'Goal') | (df['type'] == 'MissedShots') | (df['type'] == 'SavedShot') | (df['type'] == 'ShotOnPost'))
-    
-    ashots_df = df[mask2]
-    ashots_df.reset_index(drop=True, inplace=True)
-    amissed = ashots_df[ashots_df['type'] == 'MissedShots']
-    asaved = ashots_df[ashots_df['type'] == 'SavedShot']
-    apost = ashots_df[ashots_df['type'] == 'ShotOnPost']
-    agoals = ashots_df[ashots_df['type'] == 'Goal']
-    
-    team1_goals = hgoals.shape[0]
-    team2_goals = agoals.shape[0]
-    
-    team1_shots = hshots_df.shape[0]
-    team2_shots = ashots_df.shape[0]
-    
-    team1_shots_ot = hsaved.shape[0]
-    team2_shots_ot = asaved.shape[0]
-
-    
-    pitch = Pitch(pitch_type='uefa', line_zorder=1
-              ,pitch_color=background, line_color='white',linewidth=0.2)
-    pitch.draw(ax=ax)
-    fig.set_facecolor(background)
-    
-    
-    
-    goals_team1 = team1_goals
-    goals_team2 = team2_goals
-    
-    # Calculate the width of the rectangle for each team
-    total_goals = goals_team1 + goals_team2
-    
-    # Define the minimum width for the rectangles
-    min_rect_width = 8
-    
-    # Coordinates for the rectangle
-    rect_x = 20 # X-coordinate of the left side of the rectangle
-    rect_y = 55  # Y-coordinate of the top side of the rectangle
-    rect_width = 65  # Width of the rectangle
-    rect_height = 6  # Height of the rectangle
-    
-    # Calculate the width of the rectangle for each team
-    # Calculate the width of the rectangle for each team
-    if goals_team1 == 0 and goals_team2 > 0:
-        # If the home team scored 0 goals and the away team scored greater than 0
-        width_team1 = 0
-        width_team2 = 1
-    elif goals_team1 > 0 and goals_team2 == 0:
-        # If the away team scored 0 goals and the home team scored greater than 0
-        width_team1 = 1
-        width_team2 = 0
-    elif total_goals > 0:
-        # If both teams scored some goals
-        width_team1 = max(goals_team1 / total_goals, min_rect_width / rect_width)
-        width_team2 = max(goals_team2 / total_goals, min_rect_width / rect_width)
-    else:
-        # Both teams scored 0 goals, set equal width for both
-        width_team1 = 0.5
-        width_team2 = 0.5
-    
-    
-    # Create a rectangle patch for team1
-    rect_team1 = Rectangle((rect_x, rect_y), width_team1 * rect_width, rect_height, facecolor=team1_facecolor,alpha=0.95,zorder=2)
-    
-    # Create a rectangle patch for team2
-    rect_team2 = Rectangle((rect_x + width_team1 * rect_width, rect_y), width_team2 * rect_width, rect_height, facecolor=team2_facecolor,
-                           alpha=0.95,edgecolor=background,zorder=2)
-    
-    # Add rectangles to the pitch
-    ax.add_patch(rect_team1)
-    ax.add_patch(rect_team2)
-    
-    # Calculate the position for 'GOALS' text
-    goals_text_x = rect_x + width_team1 * rect_width + (width_team2 * rect_width - width_team1 * rect_width) / 2
-    goals_text_y = rect_y + rect_height / 2
-    
-    # Add labels for teams' goals
-    ax.text(28, rect_y + rect_height / 2, str(goals_team1), color=text_color, ha='right', va='center',fontsize=10,fontproperties=font_prop)
-    ax.text(53, 58, 'GOALS', color = text_color, ha='center', va='center',fontproperties=font_prop,fontsize=10,zorder=2)
-    ax.text(78, rect_y + rect_height / 2, str(goals_team2), color = text_color, ha='left', va='center',fontsize=10,fontproperties=font_prop)
-    
-    #### Adding xG
-    
-    # Calculate the width of the rectangle for each team
-    total_xG = team1_xg + team2_xg
-    width_team1_xG = team1_xg / total_xG
-    width_team2_xG = team2_xg / total_xG
-    
-    if width_team2_xG < 0.05:
-        width_team1_xG = 1
-        width_team2_xG = 0.02
-    elif width_team1_xG < 0.05:
-        width_team2_xG = 1
-        width_team1_xG = 0.05
-        
-    
-    # Coordinates for the rectangle
-    xG_rect_x = 20 # X-coordinate of the left side of the rectangle
-    xG_rect_y = 45 # Y-coordinate of the top side of the rectangle
-    
-    # Create a rectangle patch for team1
-    xG_rect_team1 = Rectangle((xG_rect_x, xG_rect_y), width_team1_xG * rect_width, rect_height, facecolor=team1_facecolor,alpha=0.95,zorder=2)
-    
-    # Create a rectangle patch for team2
-    xG_rect_team2 = Rectangle((xG_rect_x + width_team1_xG * rect_width, xG_rect_y), width_team2_xG * rect_width, rect_height,edgecolor=background,
-                              alpha=0.95,facecolor=team2_facecolor,zorder=2)
-    
-    # Add rectangles to the pitch
-    ax.add_patch(xG_rect_team1)
-    ax.add_patch(xG_rect_team2)
-    
-    # Add labels for teams' goals
-    ax.text(30, xG_rect_y + rect_height / 2, str(team1_xg), color = text_color, ha='right', va='center',fontsize=10,fontproperties=font_prop)
-    ax.text(53, 48, 'xG', color = text_color, ha='center', va='center',fontsize=10,fontproperties=font_prop)
-    ax.text(76, xG_rect_y + rect_height / 2, str(team2_xg), color = text_color, ha='left', va='center',fontsize=10,fontproperties=font_prop)
-
-    #### Adding Shots
-    shots_team1 = team1_shots
-    shots_team2 = team2_shots
-    
-    shots_team1_ot = team1_shots_ot
-    shots_team2_ot = team2_shots_ot
-    
-    # Calculate the width of the rectangle for each team
-    total_shots = shots_team1 + shots_team2
-    width_team1_shots = shots_team1 / total_shots
-    width_team2_shots = shots_team2 / total_shots
-    
-    if width_team2_shots < 0.05:
-        width_team1_shots = 1
-        width_team2_shots = 0.02
-    elif width_team1_shots < 0.05:
-        width_team2_shots = 1
-        width_team1_shots = 0.05
-    
-    # Coordinates for the rectangle
-    shots_rect_x = 20 # X-coordinate of the left side of the rectangle
-    shots_rect_y = 35 # Y-coordinate of the top side of the rectangle
-    
-    # Create a rectangle patch for team1
-    shots_rect_team1 = Rectangle((shots_rect_x, shots_rect_y), width_team1_shots * rect_width, rect_height, facecolor=team1_facecolor,alpha=0.95,zorder=2)
-    
-    # Create a rectangle patch for team2
-    shots_rect_team2 = Rectangle((shots_rect_x + width_team1_shots * rect_width, shots_rect_y), width_team2_shots * rect_width, rect_height,
-                                 alpha=0.95,edgecolor=background, facecolor=team2_facecolor,zorder=2)
-    
-    # Add rectangles to the pitch
-    ax.add_patch(shots_rect_team1)
-    ax.add_patch(shots_rect_team2)
-    
-    # Calculate the position for 'GOALS' text
-    shots_text_x = shots_rect_x + width_team1_shots * rect_width + (width_team2_shots * rect_width - width_team1_shots * rect_width) / 2
-    shots_text_y = shots_rect_y + rect_height / 2
-    
-    # Add labels for teams' goals
-    ax.text(30, shots_rect_y + rect_height / 2, str(shots_team1) + '(' + str(shots_team1_ot) + ')', color = text_color, ha='right', va='center',fontsize=10,fontproperties=font_prop)
-    ax.text(shots_text_x, shots_text_y, 'SHOTS(OT)', color = text_color, ha='center', va='center',fontsize=10,fontproperties=font_prop)
-    ax.text(74, shots_rect_y + rect_height / 2, str(shots_team2) + '(' + str(shots_team2_ot) + ')', color = text_color, ha='left', va='center',fontsize=10,fontproperties=font_prop)
-    
-    #### Adding possesion
-    # Calculate the width of the rectangle for each team
-    total_possesion = team1_pos + team2_pos
-    width_team1_possesion = (team1_pos / total_possesion)*1.05
-    width_team2_possesion = team2_pos / total_possesion
-    
-    # Coordinates for the rectangle
-    possesion_rect_x = 20 # X-coordinate of the left side of the rectangle
-    possesion_rect_y = 25 # Y-coordinate of the top side of the rectangle
-    
-    # Create a rectangle patch for team1
-    possesion_rect_team1 = Rectangle((possesion_rect_x, possesion_rect_y), width_team1_possesion * rect_width, rect_height,alpha=0.95, facecolor=team1_facecolor,zorder=2)
-    
-    # Create a rectangle patch for team2
-    possesion_rect_team2 = Rectangle((possesion_rect_x + width_team1_possesion * rect_width, possesion_rect_y), width_team2_possesion * (rect_width-1.5),
-                                     rect_height, facecolor=team2_facecolor,edgecolor=background,zorder=2,alpha=0.95)
-    
-    # Add rectangles to the pitch
-    ax.add_patch(possesion_rect_team1)
-    ax.add_patch(possesion_rect_team2)
-    
-    # Calculate the position for 'GOALS' text
-    possesion_text_x = possesion_rect_x + width_team1_possesion * rect_width + (width_team2_possesion * rect_width - width_team1_possesion * rect_width) / 2
-    possesion_text_y = possesion_rect_y + rect_height / 2
-    
-    # Add labels for teams' goals
-    ax.text(28, possesion_rect_y + rect_height / 2, str(team1_pos), color =text_color, ha='right', va='center',fontsize=10,fontproperties=font_prop)
-    ax.text(possesion_text_x, possesion_text_y, 'POSSESSION %', color = text_color, ha='center', va='center',fontsize=10,fontproperties=font_prop)
-    ax.text(78, possesion_rect_y + rect_height / 2, str(team2_pos), color = text_color, ha='left', va='center',fontsize=10,fontproperties=font_prop)
-
-    #### Adding Accurate Passes
-    # Calculate the width of the rectangle for each team
-    total_acc_passes = team1_acc_passes + team2_acc_passes
-    width_team1_acc_passes = (team1_acc_passes / total_acc_passes)*1.05
-    width_team2_acc_passes = team2_acc_passes / total_acc_passes
-    
-    # Coordinates for the rectangle
-    acc_passes_rect_x = 20 # X-coordinate of the left side of the rectangle
-    acc_passes_rect_y = 15 # Y-coordinate of the top side of the rectangle
-    
-    # Create a rectangle patch for team1
-    acc_passes_rect_team1 = Rectangle((acc_passes_rect_x, acc_passes_rect_y), width_team1_acc_passes * rect_width, rect_height,alpha=0.95, facecolor=team1_facecolor,zorder=2)
-    
-    # Create a rectangle patch for team2
-    acc_passes_rect_team2 = Rectangle((acc_passes_rect_x + width_team1_acc_passes * rect_width, acc_passes_rect_y), width_team2_acc_passes * (rect_width-1.5),
-                                      rect_height, facecolor=team2_facecolor,edgecolor=background,zorder=2,alpha=0.95)
-    
-    # Add rectangles to the pitch
-    ax.add_patch(acc_passes_rect_team1)
-    ax.add_patch(acc_passes_rect_team2)
-    
-    # Calculate the position for 'GOALS' text
-    acc_passes_text_x = acc_passes_rect_x + width_team1_acc_passes * rect_width + (width_team2_acc_passes * rect_width - width_team1_acc_passes * rect_width) / 2
-    acc_passes_text_y = acc_passes_rect_y + rect_height / 2
-    
-    # Add labels for teams' goals
-    ax.text(28, acc_passes_rect_y + rect_height / 2, str(team1_acc_passes), color = text_color, ha='right', va='center',fontsize=10,fontproperties=font_prop)
-    ax.text(acc_passes_text_x, acc_passes_text_y, 'ACC. PASSES(%)', color = text_color, ha='center', va='center',fontsize=10,fontproperties=font_prop)
-    ax.text(78, acc_passes_rect_y + rect_height / 2, str(team2_acc_passes), color = text_color, ha='left', va='center',fontsize=10,fontproperties=font_prop)
-
-    #### Adding saves
-    # Calculate the width of the rectangle for each team
-    total_saves = team1_saves + team2_saves
-    width_team1_saves = (team1_saves / total_saves)*1.05
-    width_team2_saves = team2_saves / total_saves
-    
-    # Coordinates for the rectangle
-    saves_rect_x = 20 # X-coordinate of the left side of the rectangle
-    saves_rect_y = 5 # Y-coordinate of the top side of the rectangle
-    
-    # Create a rectangle patch for team1
-    saves_rect_team1 = Rectangle((saves_rect_x, saves_rect_y), width_team1_saves * rect_width, rect_height,alpha=0.95, facecolor=team1_facecolor,zorder=2)
-    
-    # Create a rectangle patch for team2
-    saves_rect_team2 = Rectangle((saves_rect_x + width_team1_saves * rect_width, saves_rect_y), width_team2_saves * (rect_width-1.5),
-                                     rect_height, facecolor=team2_facecolor,edgecolor=background,zorder=2,alpha=0.95)
-    
-    # Add rectangles to the pitch
-    ax.add_patch(saves_rect_team1)
-    ax.add_patch(saves_rect_team2)
-    
-    # Calculate the position for 'GOALS' text
-    saves_text_x = saves_rect_x + width_team1_saves * rect_width + (width_team2_saves * rect_width - width_team1_saves * rect_width) / 2
-    saves_text_y = saves_rect_y + rect_height / 2
-    
-    # Add labels for teams' goals
-    ax.text(28, saves_rect_y + rect_height / 2, str(team1_saves), color =text_color, ha='right', va='center',fontsize=10,fontproperties=font_prop)
-    ax.text(saves_text_x, saves_text_y, 'SAVES', color = text_color, ha='center', va='center',fontsize=10,fontproperties=font_prop)
-    ax.text(78, saves_rect_y + rect_height / 2, str(team2_saves), color = text_color, ha='left', va='center',fontsize=10,fontproperties=font_prop)
-
 def summarize_player_shots(df):
     # Filter relevant shot types
     mask_shots = df['type'].isin(['Goal', 'MissedShots', 'SavedShot', 'ShotOnPost'])
@@ -2101,8 +2037,6 @@ def summarize_player_shots(df):
 
     return player_summary
 
-
-
 def calculate_angle(x, y,GOAL_X,GOAL_Y):
     goal_width = 7.32
     goal_left = GOAL_Y - goal_width / 2
@@ -2117,11 +2051,6 @@ def calculate_angle(x, y,GOAL_X,GOAL_Y):
     return angle
 
 def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor,text_color,background):
-    
-    df['x'] = df['x']*1.05
-    df['y'] = df['y']*0.68
-    df['endX'] = df['endX']*1.05
-    df['endY'] = df['endY']*0.68
 
     xgb_model = joblib.load('C://Users//acer//Documents//GitHub//IndianCitizen//ScorePredict//notebooks//xgboost_xg_model.pkl')
 
@@ -2140,6 +2069,7 @@ def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor,text
     df['shotBodyType'] = df['shotBodyType'].fillna('Unknown')
     df = pd.get_dummies(df, columns=['shotBodyType'], drop_first=True)
 
+    
     # Use same features as training
     training_features = ['shot_distance', 'shot_angle', 'shotOpenPlay', 'shotCounter', 
                         'shotSetPiece', 'shotDirectCorner'] + \
@@ -2150,8 +2080,14 @@ def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor,text
         if col not in df.columns:
             df[col] = 0
 
+
     # Reorder columns
     X_match = df[training_features]
+
+    # Ensure these columns are proper booleans
+    bool_cols = ['shotOpenPlay', 'shotCounter', 'shotSetPiece', 'shotDirectCorner']
+    for col in bool_cols:
+        X_match[col] = X_match[col].astype(bool)
 
     df['xG'] = xgb_model.predict_proba(X_match)[:, 1]
 
@@ -2229,12 +2165,12 @@ def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor,text
     pitch.scatter(90,-5,marker='s', edgecolors=text_color,linewidth=3, s=1000, c=background,ax=axs['pitch'])
     pitch.annotate('Blocked', xy=(98,-5), fontsize=30,color=text_color,fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
 
-    #pitch.annotate('ShotMap', xy=(10, 75), fontsize=60,color='white',fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
+    pitch.annotate('ShotMap', xy=(1, 75),fontproperties=font_prop, fontsize=80,color=text_color,ax=axs['pitch'], ha='left', va='center')
 
     logo = mpimg.imread('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Score Logos-20241022T100701Z-001/Score Logos/ScoreSquareWhite.png')
 
     ax_image = add_image(
-        logo, fig, left=0.85, bottom=0.15, width=0.08, height=0.08,aspect='equal'
+        logo, fig, left=0.78, bottom=0.84, width=0.08, height=0.08,aspect='equal'
     )
 
     hteam_img = mpimg.imread(f'C:\\Users\\acer\\Documents\\GitHub\\IndianCitizen\\ScorePredict\\Images\\TeamLogos\\{hteam}.png')
@@ -2266,51 +2202,19 @@ def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor,text
     player_df = summarize_player_shots(df)
     #print(summary_df)
     #st.dataframe(summary_df)
-    return summary_df,player_df
+    return summary_df,player_df,home_shots_df,away_shots_df
 
-def shotMap(df,ax,team,team_color):
-    pitch = VerticalPitch(pitch_type='uefa',half=True, corner_arcs=True, pitch_color=background, line_color='white', linewidth=0.5)
-    pitch.draw(ax=ax)
-
-    mask = ((df['teamName'] == team)) & ((df['type'] == 'Goal') | (df['type'] == 'MissedShots') | (df['type'] == 'SavedShot') | (df['type'] == 'ShotOnPost'))
-    
-    shots_df = df[mask]
-    shots_df.reset_index(drop=True, inplace=True)
-    missed = shots_df[shots_df['type'] == 'MissedShots']
-    saved = shots_df[shots_df['type'] == 'SavedShot']
-    post = shots_df[shots_df['type'] == 'ShotOnPost']
-    goals = shots_df[shots_df['type'] == 'Goal']
-    #xG = round(shots_df['expectedGoals'].sum(),2)
-    #xGOT = round(shots_df['expectedGoalsOnTarget'].sum(),2)
-
-    pitch.scatter(missed.x,missed.y,marker='o', edgecolors=team_color, s=300, c=background,ax=ax)
-    pitch.scatter(saved.x,saved.y,marker='o', edgecolors='white', s=300, c=team_color,zorder=4,ax=ax)
-    pitch.scatter(post.x,post.y,marker='o', edgecolors='red', s=300, c=team_color,zorder=5,ax=ax)
-    pitch.scatter(goals.x,goals.y,marker='football', edgecolors=background, s=500, c=team_color,ax=ax)
-
-    
-    ax.text(45,108, f"{team}", fontsize=30,color='white',fontproperties=font_prop)
-    
-    ax.text(65,70, f'Total Shots: {shots_df.shape[0]}', fontsize=18, ha='left', va='center',color='white',fontproperties=font_prop)
-    ax.text(65,65, f'Goals: {goals.shape[0]}', fontsize=18, ha='left', va='center',color='white',fontproperties=font_prop)
-    ax.text(65,60, f'Shots on Target: {saved.shape[0] + goals.shape[0]}', fontsize=18, ha='left', va='center',color='white',fontproperties=font_prop)
-    ax.text(65,55, f'Shots off Target: {missed.shape[0]}', fontsize=18, ha='left', va='center',color='white',fontproperties=font_prop)
-    #ax.text(18,60, f'xG: {xG}', fontsize=18, ha='left', va='center',color='white',fontproperties=font_prop)
-    #ax.text(18,55, f'xGOT: {xGOT}', fontsize=18, ha='left', va='center',color='white',fontproperties=font_prop)
-    #st.pyplot(fig)
-    return
-
-def xgFlow(ax,home_shots_df,away_shots_df,team1,team2,team1_facecolor,team2_facecolor):
-    dfhome_xG = home_shots_df[['player','minute','expectedGoals','result','situation']]
-    dfaway_xG = away_shots_df[['player','minute','expectedGoals','result','situation']]
-    #df_xG['teamName'] = df_xG.apply(lambda x: hometeam if x['teamId'] == team2Id else (awayteam if x['teamId'] == team1Id else None), axis=1)
-    
-    dfhome_xG['teamName'] = team1
-    dfaway_xG['teamName'] = team2
+def xgFlow(ax,home_shots_df,away_shots_df,team1,team2,team1_facecolor,team2_facecolor,text_color,background):
+    home_shots_df = home_shots_df.sort_values(by='eventId')
+    away_shots_df = away_shots_df.sort_values(by='eventId')
+    dfhome_xG = home_shots_df[['playerName','minute','xG','type','situation','teamName']]
+    dfaway_xG = away_shots_df[['playerName','minute','xG','type','situation','teamName']]
     
     df_xG = pd.concat([dfhome_xG, dfaway_xG], ignore_index=True)
     
-    df_xG['cumulative_xG'] = df_xG.groupby('teamName')['expectedGoals'].cumsum()
+    #df_xG['cumulative_xG'] = df_xG.groupby('teamName')['xG'].sum()
+    df_xG['cumulative_xG'] = df_xG.groupby('teamName')['xG'].cumsum()
+
     
     df_xG['minute'] = pd.to_numeric(df_xG['minute'], errors='coerce')
     
@@ -2323,11 +2227,11 @@ def xgFlow(ax,home_shots_df,away_shots_df,team1,team2,team1_facecolor,team2_face
         team_df = df_xG[df_xG['teamName'] == team]
         
         # add a 0 xG row at the start of the match
-        team_df = pd.concat([pd.DataFrame({'teamName': team, 'minute': 0, 'expectedGoals': 0, 'result': 'Goal', 'cumulative_xG': 0, 'half': 1},
+        team_df = pd.concat([pd.DataFrame({'teamName': team, 'minute': 0, 'xG': 0, 'type': 'Goal', 'cumulative_xG': 0, 'half': 1},
                                           index=[0]), team_df])
         
         # Also add a row at the beginning of the second half to make the lines start where the first half ended
-        team_df = pd.concat([team_df[team_df['half'] == 1], pd.DataFrame({'teamName': team, 'minute': 45, 'expectedGoals': 0, 'result': 'Goal',
+        team_df = pd.concat([team_df[team_df['half'] == 1], pd.DataFrame({'teamName': team, 'minute': 45, 'xG': 0, 'type': 'Goal',
                                                                           'cumulative_xG': team_df[team_df['half'] == 1]['cumulative_xG'].iloc[-1],
                                                                           'half': 2}, index=[0]), team_df[team_df['half'] == 2]])
     
@@ -2345,14 +2249,14 @@ def xgFlow(ax,home_shots_df,away_shots_df,team1,team2,team1_facecolor,team2_face
     
     # We Can add a scatter plot to show the goals
     for team in df_xG['teamName'].unique():
-        team_df = df_xG[(df_xG['teamName'] == team) & (df_xG['result'] == 'Goal')].to_dict(orient='records')
+        team_df = df_xG[(df_xG['teamName'] == team) & (df_xG['type'] == 'Goal')].to_dict(orient='records')
         for x in team_df:
             ax.scatter(
                 x['minute'], 
                 x['cumulative_xG'], 
                 c=team2_facecolor if team == team2 else team1_facecolor,
-                edgecolor='white',
-                s=600,
+                edgecolor=text_color,
+                s=800,
                 marker='*',
                 # We want the goals to be on top of the lines
                 zorder=5
@@ -2361,14 +2265,13 @@ def xgFlow(ax,home_shots_df,away_shots_df,team1,team2,team1_facecolor,team2_face
             # add a label to the goals for the player who scored
             ax.text(
                 x['minute']+1, 
-                x['cumulative_xG'] + .1, 
-                x['player'].split()[-1], 
+                x['cumulative_xG'] + .15, 
+                f"{x['playerName']}\nxG: {round(x['xG'],2)}", 
                 ha='center', 
                 va='center',
-                c='white',
-                fontfamily='monospace', 
-                fontsize=18,
+                c=text_color,
                 fontproperties=font_prop,
+                fontsize=22,
                 zorder=10
             )
             
@@ -2376,92 +2279,144 @@ def xgFlow(ax,home_shots_df,away_shots_df,team1,team2,team1_facecolor,team2_face
     ax.set_xticks([0, 45, 90])
     ax.set_xticklabels(['0\'', '45\'', '90\''])
     
-    # Lets add the actual words "First Half" and "Second Half" to the plot under the x axis
-    #ax.text(22.5, -.15, 'First Half', ha='center', fontfamily='monospace',fontproperties=font_prop, fontsize=20,color='white')
-    #ax.text(67.5, -.15, 'Second Half', ha='center', fontfamily='monospace',fontproperties=font_prop, fontsize=20,color='white')
-    #ax.text(107.5, -.25, 'Extra Time', ha='center', fontfamily='monospace', fontsize=20,color='white')
-
-    #ax.text(42, 3, 'xG Flow', ha='center',fontproperties=font_prop, fontsize=28,color='white')
+    ax.text(-0.8, df_xG['cumulative_xG'].max() + 0.15, 'xG Flow', ha='left',fontproperties=font_prop, fontsize=50,color='white')
     
     # Let's label the y axis with the cumulative xG
-    ax.set_ylabel('Cumulative xG', fontfamily='monospace',fontproperties=font_prop, fontsize=20,color='white')
+    ax.set_ylabel('Cumulative xG', fontfamily='monospace',fontproperties=font_prop, fontsize=22,color=text_color)
     
     # Let's get rid of the right and top spines
-    ax.spines['right'].set_visible(True)
+    ax.spines['left'].set_visible(True)
+    ax.spines['left'].set_color(text_color)
     ax.spines['top'].set_visible(True)
+    ax.spines['top'].set_color(text_color)
+
+    ax.spines['right'].set_visible(True)
+    ax.spines['right'].set_color(text_color)
+    ax.spines['bottom'].set_visible(True)
+    ax.spines['bottom'].set_color(text_color)
     
-    ax.tick_params(axis='x', colors='white', labelsize=15)
-    ax.tick_params(axis='y', colors='white', labelsize=15)
+    ax.tick_params(axis='x', colors=text_color, labelsize=15)
+    ax.tick_params(axis='y', colors=text_color, labelsize=15)
     
-    ax.axvline(x=45, color='white', linestyle='--', linewidth=1,alpha=0.5)
+    ax.axvline(x=45, color=text_color, linestyle='--', linewidth=1,alpha=0.5)
 
 def get_passes_df(df):
     df1 = df[~df['type'].str.contains('SubstitutionOn|FormationChange|FormationSet|Card')]
     df = df1
     df.loc[:, "receiver"] = df["playerId"].shift(-1)
     passes_ids = df.index[df['type'] == 'Pass']
-    df_passes = df.loc[passes_ids, ["index", "x", "y","minute", "endX", "endY", "teamName", "playerId", "receiver", "type", "outcomeType", "pass_or_carry_angle"]]
+    df_passes = df.loc[passes_ids, ["index", "x", "y","minute", "endX", "endY", "teamName", "playerId", "receiver", "type", "outcomeType","isFirstEleven","playerName"]].copy()
 
     return df_passes
 
-def passing_stats1(teamName, df):
-    dfpass = df[(df['teamName'] == teamName) & (df['type'] == 'Pass')]
+def get_initials(name):
+    if pd.isna(name):
+        return ''
+    parts = name.strip().split()
+    initials = [p[0].upper() + '.' for p in parts if p]
+    return ''.join(initials)
 
-    total_passes = dfpass.shape[0]
-    acc_pass = dfpass[dfpass['outcomeType'] == 'Successful']
-    through_pass = dfpass[(dfpass['qualifiers'].str.contains('Throughball')) & (~dfpass['qualifiers'].str.contains('CornerTaken|Freekick'))]
-    Lng_ball = dfpass[(dfpass['qualifiers'].str.contains('Longball')) & (~dfpass['qualifiers'].str.contains('CornerTaken|Freekick'))]
-    Crosses = dfpass[(dfpass['qualifiers'].str.contains('Cross')) & (~dfpass['qualifiers'].str.contains('CornerTaken|Freekick'))]
-    pen_box = acc_pass[(acc_pass['endX'] >= 88.5) & (acc_pass['endY'] >= 13.6) & (acc_pass['endY'] <= 54.4) & 
-                       (~acc_pass['qualifiers'].str.contains('CornerTaken|Freekick'))]
+def get_pass_matrix(passes_df, teamName):
+    team_passes = passes_df[passes_df["teamName"] == teamName].copy()
 
-    return total_passes, acc_pass.shape[0], Lng_ball.shape[0]
+    # Clean and convert names to initials
+    team_passes['playerName'] = team_passes['playerName'].apply(unidecode)
+    team_passes['playerName'] = team_passes['playerName'].apply(get_initials)
 
-def passing_stats2(teamName, df):
-    dfpass = df[(df['teamName'] == teamName) & (df['type'] == 'Pass')]
 
-    total_passes = dfpass.shape[0]
-    acc_pass = dfpass[dfpass['outcomeType'] == 'Successful']
-    through_pass = dfpass[(dfpass['qualifiers'].str.contains('Throughball')) & (~dfpass['qualifiers'].str.contains('CornerTaken|Freekick'))]
-    Lng_ball = dfpass[(dfpass['qualifiers'].str.contains('Longball')) & (~dfpass['qualifiers'].str.contains('CornerTaken|Freekick'))]
-    Crosses = dfpass[(dfpass['qualifiers'].str.contains('Cross')) & (~dfpass['qualifiers'].str.contains('CornerTaken|Freekick'))]
-    pen_box = acc_pass[(acc_pass['endX'] >= 88.5) & (acc_pass['endY'] >= 13.6) & (acc_pass['endY'] <= 54.4) & 
-                       (~acc_pass['qualifiers'].str.contains('CornerTaken|Freekick'))]
+    # Build mapping AFTER cleaning
+    id_to_name = dict(zip(team_passes['playerId'], team_passes['playerName']))
 
-    return Crosses.shape[0], pen_box.shape[0], through_pass.shape[0]
+    # Map receiverId to initials using cleaned playerName mapping
+    team_passes['receiverName'] = team_passes['receiver'].map(id_to_name)
 
-def get_passes_between_df(teamName, passes_df, players_df):
-    passes_df = passes_df[(passes_df["teamName"] == teamName)]
-    # df = pd.DataFrame(events_dict)
-    dfteam = df[(df['teamName'] == teamName) & (~df['type'].str.contains('SubstitutionOn|FormationChange|FormationSet|Card'))]
-    passes_df = passes_df.merge(players_df[["playerId", "isFirstEleven"]], on='playerId', how='left')
-    # calculate median positions for player's passes
-    average_locs_and_count_df = (dfteam.groupby('playerId').agg({'x': ['median'], 'y': ['median', 'count']}))
-    average_locs_and_count_df.columns = ['pass_avg_x', 'pass_avg_y', 'count']
-    average_locs_and_count_df = average_locs_and_count_df.merge(players_df[['playerId', 'name', 'shirtNo', 'position', 'isFirstEleven']], on='playerId', how='left')
-    average_locs_and_count_df = average_locs_and_count_df.set_index('playerId')
-    average_locs_and_count_df['name'] = average_locs_and_count_df['name'].apply(unidecode)
-    # calculate the number of passes between each position (using min/ max so we get passes both ways)
-    passes_player_ids_df = passes_df.loc[:, ['index', 'playerId', 'receiver', 'teamName']]
-    passes_player_ids_df['pos_max'] = (passes_player_ids_df[['playerId', 'receiver']].max(axis='columns'))
-    passes_player_ids_df['pos_min'] = (passes_player_ids_df[['playerId', 'receiver']].min(axis='columns'))
-    # get passes between each player
-    passes_between_df = passes_player_ids_df.groupby(['pos_min', 'pos_max']).index.count().reset_index()
-    passes_between_df.rename({'index': 'pass_count'}, axis='columns', inplace=True)
-    # add on the location of each player so we have the start and end positions of the lines
-    passes_between_df = passes_between_df.merge(average_locs_and_count_df, left_on='pos_min', right_index=True)
-    passes_between_df = passes_between_df.merge(average_locs_and_count_df, left_on='pos_max', right_index=True, suffixes=['', '_end'])
+    # Drop any rows with missing receiverName (if any)
+    team_passes = team_passes.dropna(subset=['receiverName'])
+
+    # Create pass matrix
+    pass_matrix = team_passes.groupby(['playerName', 'receiverName']).size().unstack(fill_value=0)
+
+    return pass_matrix
+
+def filter_passes_for_subwindow(match_df, passes_df, teamName, minute_start, minute_end):
+    # Get starting players
+    starting_players = match_df[
+        (match_df['teamName'] == teamName) &
+        (match_df['isFirstEleven'] == True)
+    ]['playerId'].unique().tolist()
+
+    # Players subbed on before the end of this window
+    subs_on = match_df[
+        (match_df['teamName'] == teamName) &
+        (match_df['type'] == 'SubstitutionOn') &
+        (match_df['minute'] < minute_end)
+    ]['playerId'].tolist()
+
+    # Players subbed off before the start of this window
+    subs_off = match_df[
+        (match_df['teamName'] == teamName) &
+        (match_df['type'] == 'SubstitutionOff') &
+        (match_df['minute'] < minute_start)
+    ]['playerId'].tolist()
+
+    # Calculate who is on the pitch in this time window
+    valid_players = set(starting_players + subs_on) - set(subs_off)
+
+    # Filter the passes
+    passes_filtered = passes_df[
+        (passes_df['teamName'] == teamName) &
+        (passes_df['minute'] >= minute_start) &
+        (passes_df['minute'] < minute_end) &
+        (passes_df['playerId'].isin(valid_players)) &
+        (passes_df['receiver'].isin(valid_players))
+    ]
+
+    return passes_filtered
+
+def get_passes_between_df(teamName, passes_df):
+    passes_df = passes_df[passes_df["teamName"] == teamName].copy()
+    # Group by playerId and aggregate pass location + isFirstEleven
+    average_locs_and_count_df = (
+        passes_df.groupby('playerId').agg({
+            'x': 'median',
+            'y': 'median',
+            'playerId': 'count',
+            'playerName': 'first',
+            'isFirstEleven': 'first'
+        })
+    )
+
+    average_locs_and_count_df.columns = ['pass_avg_x', 'pass_avg_y', 'count', 'playerName', 'isFirstEleven']
+    average_locs_and_count_df.index.name = 'playerId'
+
+    average_locs_and_count_df['playerName'] = average_locs_and_count_df['playerName'].apply(unidecode)
+
+    # Build pass combinations between players (order-independent)
+    passes_player_ids_df = passes_df[['index', 'playerId', 'receiver', 'teamName']].copy()
+    passes_player_ids_df['pos_max'] = passes_player_ids_df[['playerId', 'receiver']].max(axis=1)
+    passes_player_ids_df['pos_min'] = passes_player_ids_df[['playerId', 'receiver']].min(axis=1)
+
+    passes_between_df = (
+        passes_player_ids_df
+        .groupby(['pos_min', 'pos_max'])['index']
+        .count()
+        .reset_index()
+        .rename(columns={'index': 'pass_count'})
+    )
+
+    # Merge in player locations (start and end)
+    passes_between_df = passes_between_df.merge(
+        average_locs_and_count_df, left_on='pos_min', right_index=True
+    ).merge(
+        average_locs_and_count_df, left_on='pos_max', right_index=True, suffixes=['', '_end']
+    )
 
     return passes_between_df, average_locs_and_count_df
 
-def calculate_centralization_index(teamName, passes_df, players_df, events_df, time_range):
-    start_min, end_min = time_range
+def calculate_centralization_index(teamName, passes_df):
 
     # Filter passes within the given time range and team
-    passes_df = passes_df[
-        (passes_df["teamName"] == teamName) & 
-        (passes_df["minute"] >= start_min) & (passes_df["minute"] < end_min)
-    ]
+    passes_df = passes_df[(passes_df["teamName"] == teamName)]
 
     # Calculate number of passes made by each player
     player_passes_count = passes_df["playerId"].value_counts()
@@ -2486,9 +2441,8 @@ def calculate_centralization_index(teamName, passes_df, players_df, events_df, t
 
     return centralization_index
 
-def pass_network_visualization(ax, passes_between_df, average_locs_and_count_df, col, teamName,MAX_LINE_WIDTH, flipped=False):
-    MAX_MARKER_SIZE = 2000
-    line_color='white'
+def pass_network_visualization(ax,df, passes_between_df, average_locs_and_count_df,text_color,background, col, teamName,MAX_LINE_WIDTH,flipped,ci):
+    MAX_MARKER_SIZE = 6000
     passes_between_df['width'] = (passes_between_df.pass_count / passes_between_df.pass_count.max()) * MAX_LINE_WIDTH
     average_locs_and_count_df['marker_size'] = (average_locs_and_count_df['count']/ average_locs_and_count_df['count'].max() * MAX_MARKER_SIZE) #You can plot variable size of each player's node according to their passing volume, in the plot using this
     MIN_TRANSPARENCY = 0.55
@@ -2499,45 +2453,37 @@ def pass_network_visualization(ax, passes_between_df, average_locs_and_count_df,
     c_transparency = (c_transparency * (MAX_TRANSPARENCY - MIN_TRANSPARENCY)) + MIN_TRANSPARENCY
     color[:, 3] = c_transparency
 
-    pitch = Pitch(pitch_type='uefa', corner_arcs=True, pitch_color=background, line_color='white', linewidth=1)
+    pitch = Pitch(pitch_type='uefa', corner_arcs=True, pitch_color=background, line_color=text_color, linewidth=1)
     pitch.draw(ax=ax)
     ax.set_aspect('equal')
-    #ax.set_xlim(-0.5, 105.5)
-    #ax.set_ylim(-0.5, 68.5)
-    #ax.text(43,75,"Passing Network", color='white', fontsize=25,fontproperties=font_prop)
-    centralization_index = calculate_centralization_index(teamName, passes_df, players_df, df, time_range=(0, 90))
+    
     if flipped==True:
         ax.invert_xaxis()
         ax.invert_yaxis()
-        ax.text(75,-7,"Passing Network", color='white', fontsize=25,fontproperties=font_prop)
-        pitch.annotate(f'CI - {round(centralization_index,3)}', xy=(9, 65), c=col, ha='center', va='center', size=15, ax=ax)
-      
-    else:
-        ax.text(30,75,"Passing Network", color='white', fontsize=25,fontproperties=font_prop)
-        pitch.annotate(f'CI - {round(centralization_index,3)}', xy=(95, 4), c=col, ha='center', va='center', size=15, ax=ax)
-
+    
     # Plotting those lines between players
-    pass_lines = pitch.lines(passes_between_df.pass_avg_x, passes_between_df.pass_avg_y, passes_between_df.pass_avg_x_end, passes_between_df.pass_avg_y_end,
-                             lw=passes_between_df.width, color=color, zorder=1, ax=ax)
+    pitch.lines(passes_between_df.pass_avg_x, passes_between_df.pass_avg_y, passes_between_df.pass_avg_x_end, passes_between_df.pass_avg_y_end,
+                             lw=passes_between_df.width, color=text_color, zorder=2,alpha=0.5, ax=ax)
 
     # Plotting the player nodes
     for index, row in average_locs_and_count_df.iterrows():
-      if row['isFirstEleven'] == True:
-        pass_nodes = pitch.scatter(row['pass_avg_x'], row['pass_avg_y'], s=row['marker_size'], marker='o', color=background, edgecolor=line_color,
-                                   linewidth=2, alpha=1, ax=ax)
-      #else:
-        #pass_nodes = pitch.scatter(row['pass_avg_x'], row['pass_avg_y'], s=900, marker='s', color=background, edgecolor=line_color, linewidth=2, alpha=0.7, ax=ax)
+        player_initials = get_initials(row['playerName'])
+        pitch.scatter(row['pass_avg_x'], row['pass_avg_y'], s=row['marker_size'], marker='o', color=background, edgecolor=col,
+                                    linewidth=2, alpha=1,zorder=2, ax=ax)
+        pitch.annotate(player_initials, xy=(row.pass_avg_x, row.pass_avg_y), c=text_color, ha='center', va='center', size=18,zorder=2, ax=ax)
 
-    # Plotting the shirt no. of each player
-    for index, row in average_locs_and_count_df.iterrows():
-        if row['isFirstEleven'] == True:
-            player_initials = row["shirtNo"]
-            pitch.annotate(player_initials, xy=(row.pass_avg_x, row.pass_avg_y), c=col, ha='center', va='center', size=15, ax=ax)
+            
 
-    # Defense line Passing Height (avg. height of all the passes made by the Center Backs)
-    center_backs_height = average_locs_and_count_df[average_locs_and_count_df['position']=='DC']
-    def_line_h = round(center_backs_height['pass_avg_x'].median(), 2)
-    #ax.axvline(x=def_line_h, color='white', linestyle='dotted', alpha=0.7, linewidth=2)
+    dfteam = df[df['teamName'] == teamName]
+    df_xT = dfteam[((dfteam['type'] == 'Pass') | (dfteam['type'] == 'Carry')) & (dfteam['xT'] > 0)]
+    cmap = LinearSegmentedColormap.from_list('custom_cmap', [background, col])
+    
+    bin_statistic = pitch.bin_statistic(df_xT.x, df_xT.y, statistic='count', bins=(20, 20))
+    bin_statistic['statistic'] = gaussian_filter(bin_statistic['statistic'], 1)
+    pcm = pitch.heatmap(bin_statistic, ax=ax, cmap=cmap, edgecolors=background,alpha=0.5,zorder=1)
+
+    pitch.annotate(f'Centralization Index: {ci:.2f}', xy=(0, -4), ha='left', va='center', fontsize=30, color=text_color, fontproperties=font_prop, ax=ax)
+    
     return
 
 def passmaps(ax,df,team,team_color,flipped=False):
@@ -2737,7 +2683,7 @@ def get_da_count_df(team_name, defensive_actions_df, players_df):
     # calculate mean positions for players
     average_locs_and_count_df = (defensive_actions_df.groupby('playerId').agg({'x': ['median'], 'y': ['median', 'count']}))
     average_locs_and_count_df.columns = ['x', 'y', 'count']
-    average_locs_and_count_df = average_locs_and_count_df.merge(players_df[['playerId', 'name', 'shirtNo', 'position', 'isFirstEleven']], on='playerId', how='left')
+    #average_locs_and_count_df = average_locs_and_count_df.merge(players_df[['playerId', 'name', 'shirtNo', 'position', 'isFirstEleven']], on='playerId', how='left')
     average_locs_and_count_df = average_locs_and_count_df.set_index('playerId')
 
     return  average_locs_and_count_df
