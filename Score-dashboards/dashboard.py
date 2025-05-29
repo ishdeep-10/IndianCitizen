@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import sqlite3
+from datetime import datetime
 
 # Set page config
 st.set_page_config(
@@ -11,22 +11,38 @@ st.set_page_config(
     layout="wide"
 )
 
-# Function to load data from SQLite
+# Cache the data loading
+@st.cache_data(ttl=3600)  # Cache for 1 hour
 def load_data():
-    conn = sqlite3.connect('sportmonks.db')
-    query = "SELECT * FROM transfer_rumours"
-    df = pd.read_sql_query(query, conn)
-    conn.close()
-    
-    # Convert market value to numeric
-    df['market_value_numeric'] = df['market_value'].apply(lambda x: float(x.replace('€', '').replace('m', '')) if 'm' in x else float(x.replace('€', '').replace('k', ''))/1000 if 'k' in x else 0)
-    return df
+    """
+    Load data from CSV file
+    """
+    try:
+        df = pd.read_csv('transfer_rumours.csv')
+        
+        # Convert market value to numeric
+        df['market_value_numeric'] = df['market_value'].apply(
+            lambda x: float(str(x).replace('€', '').replace('m', '')) 
+            if 'm' in str(x) 
+            else float(str(x).replace('€', '').replace('k', ''))/1000 
+            if 'k' in str(x) 
+            else 0
+        )
+        return df
+    except Exception as e:
+        st.error(f"Error loading data: {e}")
+        return pd.DataFrame()
 
 # Load the data
 df = load_data()
 
-# Dashboard title
+if df.empty:
+    st.error("No data available. Please make sure transfer_rumours.csv exists in the app directory.")
+    st.stop()
+
+# Dashboard title with last update time
 st.title("⚽ Transfer Rumors Dashboard")
+st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 st.markdown("---")
 
 # Sidebar filters
@@ -59,6 +75,14 @@ filtered_df = filtered_df[
     (filtered_df['market_value_numeric'] >= market_value_range[0]) &
     (filtered_df['market_value_numeric'] <= market_value_range[1])
 ]
+
+# Display total number of rumors and total market value
+col1, col2 = st.columns(2)
+with col1:
+    st.metric("Total Rumors", len(filtered_df))
+with col2:
+    total_value = filtered_df['market_value_numeric'].sum()
+    st.metric("Total Market Value", f"€{total_value:.1f}M")
 
 # Create layout with columns
 col1, col2 = st.columns(2)
@@ -132,7 +156,7 @@ st.dataframe(
     filtered_df[[
         'player_name', 'position', 'age', 'current_club',
         'interested_club', 'market_value', 'probability'
-    ]],
+    ]].sort_values('probability', ascending=False),
     hide_index=True,
     width=1500
 ) 
