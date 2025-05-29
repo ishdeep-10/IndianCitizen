@@ -292,7 +292,7 @@ away_team_col = match_df[match_df['teamName'] == away_team]['teamColor'].unique(
 
 viz = st.selectbox(
     'Select Action',
-    ['Shots', 'In Possession'],
+    ['Shots', 'In Possession', 'Duels', 'Out of Possession', 'Set Pieces'],
     index=0
 )
 
@@ -311,12 +311,20 @@ else:
 
 if viz == 'Shots':
     #fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(20,22))
+    st.markdown("## Shot Map")
     pitch = Pitch(pitch_type='uefa',half=False, corner_arcs=True, pitch_color=background, line_color=line_color, linewidth=1.5)
     fig, axs = pitch.jointgrid(figheight=20,grid_width =1, left=None, bottom=None, grid_height=0.9,
                            axis=False,title_space=0,endnote_height=0,title_height=0,ax_top=False)
     fig.set_facecolor(background)
+
+    situations = match_df['situation'].dropna().unique().tolist()
+    situations = ['All'] + situations
+    situation = st.radio('',options=situations,index=0,horizontal=True,label_visibility='collapsed')
     
-    summary_df,player_df,home_shots_df,away_shots_df = shotMap_ws(match_df,axs,fig,pitch,home_team,away_team,home_team_col,away_team_col,text_color,background)
+    ax_image = add_image(
+        logo, fig, left=0.77, bottom=0.85, width=0.08, height=0.08,aspect='equal'
+    )
+    summary_df,player_df,home_shots_df,away_shots_df = shotMap_ws(match_df,axs,fig,pitch,home_team,away_team,home_team_col,away_team_col,text_color,background,situation)
     #shotMap(match_df,axs[1],away_team,'red')
     axs['pitch'].set_xlim(-10, 115)  # example: pitch length from 0 to 120
     axs['pitch'].set_ylim(-10, 80)   # example: pitch width from 0 to 80
@@ -324,6 +332,7 @@ if viz == 'Shots':
     st.dataframe(summary_df, width=1000)
     st.dataframe(player_df, width=1000)
 
+    st.markdown("## xG Flow")
     fig2, axs2 = plt.subplots(nrows=1, ncols=1, figsize=(20,12))
     fig2.set_facecolor(background)
 
@@ -335,40 +344,61 @@ if viz == 'Shots':
     st.pyplot(fig2)
 
 if viz == 'In Possession':
+    st.markdown("## Passing Network and Pass Combination Matrix")
     passes_df = get_passes_df(match_df)
-    team = st.radio('',options=[home_team, away_team],index=0,horizontal=True)
+    team = st.radio('',options=[home_team, away_team],index=0,horizontal=True, label_visibility='collapsed')
     fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(20,15))
     fig.set_facecolor(background)
     
     ax_image = add_image(
         logo, fig, left=0.82, bottom=0.83, width=0.07, height=0.07,aspect='equal'
     )
+
+
     if team == home_team:
         
-        minute_of_subs = match_df[(match_df['teamName'] == home_team) & (match_df['type'] == 'SubstitutionOn')]['minute'].unique()
-        minute_of_subs.sort()  # Ensure they're in order
-        minute_of_subs = minute_of_subs[minute_of_subs < 90]
+        # Get and sort substitution minutes
+        minute_of_subs = match_df[
+            (match_df['teamName'] == home_team) & (match_df['type'] == 'SubstitutionOn')
+        ]['minute'].unique()
+
+        minute_of_subs = np.sort(minute_of_subs[minute_of_subs < 90])
+
+        # Only keep substitutions that result in a 5+ minute window
+        filtered_minutes = []
+        prev = 0
+        for m in minute_of_subs:
+            if m - prev >= 5:
+                filtered_minutes.append(m)
+                prev = m
+
+        # If the last window (from last sub to 90) is too short, drop the last one
+        if len(filtered_minutes) > 0 and 90 - filtered_minutes[-1] < 5:
+            filtered_minutes.pop()
+
+        # Generate the options
         def ordinal(n):
             return ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth'][n - 1]
 
-        # Build dynamic options list
         options = ['Starting 11']
-        for i in range(len(minute_of_subs)):
+        for i in range(len(filtered_minutes)):
             options.append(f'{ordinal(i+1)} Substitution')
 
-        # Radio selector with dynamic options
-        substitutions = st.radio('', options=options, index=0, horizontal=True)
-        # Get minute_start and minute_end
+        # Radio selector
+        substitutions = st.radio('', options=options, index=0, horizontal=True, label_visibility='collapsed')
+
+        # Determine minute_start and minute_end
         if substitutions == 'Starting 11':
             minute_start = 0
-            minute_end = minute_of_subs[0] if len(minute_of_subs) > 0 else 90
+            minute_end = filtered_minutes[0] if filtered_minutes else 90
         else:
-            index = options.index(substitutions) - 1  # subtract 1 to match substitution index
-            minute_start = minute_of_subs[index]
-            minute_end = minute_of_subs[index + 1] if index + 1 < len(minute_of_subs) else 90
-        print(minute_start,minute_end)
+            index = options.index(substitutions) - 1
+            minute_start = filtered_minutes[index]
+            minute_end = filtered_minutes[index + 1] if index + 1 < len(filtered_minutes) else 90
+
+
         fig.text(
-        0.16, 0.86, f"Passing Networks {minute_start}-{minute_end}",fontproperties=font_prop,
+        0.16, 0.86, f"Minute {minute_start}-{minute_end}",fontproperties=font_prop,
         ha='left', va='center', fontsize=45, color=text_color
         )
         filtered_passes_df = filter_passes_for_subwindow(match_df, passes_df, home_team, minute_start, minute_end)
@@ -378,6 +408,7 @@ if viz == 'In Possession':
         pass_network_visualization(axs, match_df, home_passes_between_df, home_average_locs_and_count_df, text_color, background, home_team_col, home_team, 20, False,ci)
         st.pyplot(fig)
 
+        st.markdown("##### The centralization index signifies how much a team's passing network is focused around a few players — a higher value indicates greater reliance on central figures, while a lower value reflects a more balanced, distributed passing structure.")
 
         fig2,ax2 = plt.subplots(nrows=1, ncols=1, figsize=(20,10))
         fig2.set_facecolor(background)
@@ -393,30 +424,48 @@ if viz == 'In Possession':
         plt.yticks(rotation=0, fontproperties=font_prop,fontsize=12, color=text_color)
         st.pyplot(fig2)
     else:
-        minute_of_subs = match_df[(match_df['teamName'] == away_team) & (match_df['type'] == 'SubstitutionOn')]['minute'].unique()
-        minute_of_subs.sort()  # Ensure they're in order
-        minute_of_subs = minute_of_subs[minute_of_subs < 90]
+        # Get and sort substitution minutes
+        minute_of_subs = match_df[
+            (match_df['teamName'] == away_team) & (match_df['type'] == 'SubstitutionOn')
+        ]['minute'].unique()
+
+        minute_of_subs = np.sort(minute_of_subs[minute_of_subs < 90])
+
+        # Only keep substitutions that result in a 5+ minute window
+        filtered_minutes = []
+        prev = 0
+        for m in minute_of_subs:
+            if m - prev >= 5:
+                filtered_minutes.append(m)
+                prev = m
+
+        # If the last window (from last sub to 90) is too short, drop the last one
+        if len(filtered_minutes) > 0 and 90 - filtered_minutes[-1] < 5:
+            filtered_minutes.pop()
+
+        # Generate the options
         def ordinal(n):
             return ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth'][n - 1]
 
-        # Build dynamic options list
         options = ['Starting 11']
-        for i in range(len(minute_of_subs)):
+        for i in range(len(filtered_minutes)):
             options.append(f'{ordinal(i+1)} Substitution')
 
-        # Radio selector with dynamic options
-        substitutions = st.radio('', options=options, index=0, horizontal=True)
-        # Get minute_start and minute_end
+        # Radio selector
+        substitutions = st.radio('', options=options, index=0, horizontal=True, label_visibility='collapsed')
+
+        # Determine minute_start and minute_end
         if substitutions == 'Starting 11':
             minute_start = 0
-            minute_end = minute_of_subs[0] if len(minute_of_subs) > 0 else 90
+            minute_end = filtered_minutes[0] if filtered_minutes else 90
         else:
-            index = options.index(substitutions) - 1  # subtract 1 to match substitution index
-            minute_start = minute_of_subs[index]
-            minute_end = minute_of_subs[index + 1] if index + 1 < len(minute_of_subs) else 90
-        print(minute_start,minute_end)
+            index = options.index(substitutions) - 1
+            minute_start = filtered_minutes[index]
+            minute_end = filtered_minutes[index + 1] if index + 1 < len(filtered_minutes) else 90
+
+        
         fig.text(
-        0.16, 0.86, f"Passing Networks {minute_start}-{minute_end}",fontproperties=font_prop,
+        0.16, 0.86, f"Minute {minute_start}-{minute_end}",fontproperties=font_prop,
         ha='left', va='center', fontsize=45, color=text_color
         )
         filtered_passes_df = filter_passes_for_subwindow(match_df, passes_df, away_team, minute_start, minute_end)
@@ -425,6 +474,9 @@ if viz == 'In Possession':
         ci = calculate_centralization_index(away_team,filtered_passes_df)
         pass_network_visualization(axs, match_df, away_passes_between_df, away_average_locs_and_count_df, text_color, background, away_team_col, away_team, 20, False,ci)
         st.pyplot(fig)
+
+        st.markdown("##### The centralization index signifies how much a team's passing network is focused around a few players — a higher value indicates greater reliance on central figures, while a lower value reflects a more balanced, distributed passing structure.")
+
 
         fig2,ax2 = plt.subplots(nrows=1, ncols=1, figsize=(20,10))
         fig2.set_facecolor(background)
@@ -441,5 +493,51 @@ if viz == 'In Possession':
         st.pyplot(fig2)
 
 
+    st.markdown("## Passing Stats Comparison")
+    # Define desired order for metrics and teams
+    metric_order = [
+        'Total Passes', 'Passing Accuracy (%)', 'Final Third Entries',
+        'Key Passes', 'Crosses', 'Long Balls',
+        'Through Balls', 'Progressive Passes', 'Pen Box Passes','Expected Threat By Pass'
+    ]
+
+    team_order = [home_team, away_team]  # You can reverse this if needed
+
+    # Get passing stats
+    passes_stats_hteam = get_passing_stats(match_df, home_team)
+    passes_stats_ateam = get_passing_stats(match_df, away_team)
+
+    # Combine and reshape
+    combined_stats = pd.concat([passes_stats_hteam, passes_stats_ateam], axis=0)
+    combined_stats = combined_stats.melt(id_vars='Team', var_name='Metric', value_name='Value')
+    combined_stats = combined_stats.pivot(index='Metric', columns='Team', values='Value')
+
+    # Reorder rows and columns
+    combined_stats = combined_stats.loc[metric_order, team_order]
+    styled_stats = combined_stats.style \
+    .apply(lambda row: [highlight_higher(v, row.values) for v in row], axis=1) \
+    .format("{:.2f}")
+
+    st.dataframe(styled_stats, width=1000)
+
+    ## Chalkboard for each different type of pass along side top 5 players for that type of pass
+    passtype = st.radio('',options=['Final Third Entries','Crosses','Long Balls','Through Balls'],index=0,horizontal=True, label_visibility='collapsed')
+    fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(30,12))
+    fig.set_facecolor(background)
+    plt.subplots_adjust(wspace=0.02)
     
+    top_passers_h = passmaps(ax[0],match_df,home_team,home_team_col,background,text_color,passtype)
+    top_passers_a = passmaps(ax[1],match_df,away_team,away_team_col,background,text_color,passtype)
+    top_passers_h = top_passers_h.reset_index(drop=True)
+    top_passers_a = top_passers_a.reset_index(drop=True)
+    top_passers_h.columns = [f"home_{col}" for col in top_passers_h.columns]
+    top_passers_a.columns = [f"away_{col}" for col in top_passers_a.columns]
+    result = pd.concat([top_passers_h, top_passers_a], axis=1)
+    result = result.reset_index(drop=True)
+    st.pyplot(fig)
+    st.markdown(" Star marker indicates key pass / chance created and green line indicates an assist.")
+    st.dataframe(result, width=1000)
+
+if viz == 'Duels':
+    st.markdown("## Duels")
 

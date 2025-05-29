@@ -248,9 +248,6 @@ team_colors = {
     'Almere City': '#E30613'
     }
 
-
-background='#010b14'
-
 @st.cache_data
 
 def load_data(root_folder):
@@ -268,13 +265,11 @@ def load_data(root_folder):
         df = pd.DataFrame()  # empty fallback
     return df, csv_files
 
-def insert_ball_carries(events_df, min_carry_length=3, max_carry_length=60, min_carry_duration=1, max_carry_duration=10):
+def highlight_higher(val, all_vals):
+    return 'color: green; font-weight: bold' if val == max(all_vals) else ''
+
+def insert_ball_carries(events_df, min_carry_length, max_carry_length, min_carry_duration, max_carry_duration):
     events_out = pd.DataFrame()
-    # Carry conditions (convert from metres to opta)
-    min_carry_length = 3.0
-    max_carry_length = 60.0
-    min_carry_duration = 1.0
-    max_carry_duration = 10.0
     # match_events = events_df[events_df['match_id'] == match_id].reset_index()
     match_events = events_df.reset_index()
     match_carries = pd.DataFrame()
@@ -290,7 +285,9 @@ def insert_ball_carries(events_df, min_carry_length=3, max_carry_length=60, min_
 
             while incorrect_next_evt:
 
-                next_evt = match_events.loc[next_evt_idx]
+                if next_evt_idx >= len(match_events):
+                    break
+                next_evt = match_events.iloc[next_evt_idx]
 
                 if next_evt['type'] == 'TakeOn' and next_evt['outcomeType'] == 'Successful':
                     take_ons += 1
@@ -2050,7 +2047,7 @@ def calculate_angle(x, y,GOAL_X,GOAL_Y):
         angle = 0
     return angle
 
-def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor,text_color,background):
+def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor,text_color,background,situation):
 
     xgb_model = joblib.load('C://Users//acer//Documents//GitHub//IndianCitizen//ScorePredict//notebooks//xgboost_xg_model.pkl')
 
@@ -2091,9 +2088,14 @@ def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor,text
 
     df['xG'] = xgb_model.predict_proba(X_match)[:, 1]
 
-    mask1 = ((df['teamName'] == hteam)) & ((df['type'] == 'Goal') | (df['type'] == 'MissedShots') | (df['type'] == 'SavedShot') | (df['type'] == 'ShotOnPost'))
-    mask2 = ((df['teamName'] == ateam)) & ((df['type'] == 'Goal') | (df['type'] == 'MissedShots') | (df['type'] == 'SavedShot') | (df['type'] == 'ShotOnPost'))
-    
+    if situation == 'All':
+        mask1 = ((df['teamName'] == hteam)) & ((df['type'] == 'Goal') | (df['type'] == 'MissedShots') | (df['type'] == 'SavedShot') | (df['type'] == 'ShotOnPost'))
+        mask2 = ((df['teamName'] == ateam)) & ((df['type'] == 'Goal') | (df['type'] == 'MissedShots') | (df['type'] == 'SavedShot') | (df['type'] == 'ShotOnPost'))
+    else:
+        mask1 = ((df['teamName'] == hteam)) & (df['situation'] == situation) & ((df['type'] == 'Goal') | (df['type'] == 'MissedShots') | (df['type'] == 'SavedShot') | (df['type'] == 'ShotOnPost'))
+        mask2 = ((df['teamName'] == ateam)) & (df['situation'] == situation) & ((df['type'] == 'Goal') | (df['type'] == 'MissedShots') | (df['type'] == 'SavedShot') | (df['type'] == 'ShotOnPost'))
+
+
     home_shots_df = df[mask1]
     home_shots_df.reset_index(drop=True, inplace=True)
     h_missed = home_shots_df[home_shots_df['type'] == 'MissedShots']
@@ -2133,20 +2135,20 @@ def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor,text
     a_own_goals['y'] = pitch.dim.top - a_own_goals.y
     a_blocked['y'] = pitch.dim.top - a_blocked.y
 
-    pitch.scatter(h_missed.x,h_missed.y,marker='o', edgecolors=team1_facecolor, s=5000 * h_missed['xG'], c=background,ax=axs['pitch'])
-    pitch.scatter(h_saved.x,h_saved.y,marker='o', edgecolors='white', s=5000 * h_saved['xG'], c=team1_facecolor,zorder=4,ax=axs['pitch'])
-    pitch.scatter(h_post.x,h_post.y,marker='o', edgecolors='green', s=5000 * h_post['xG'], c=team1_facecolor,zorder=5,ax=axs['pitch'])
-    pitch.scatter(h_goals.x,h_goals.y,marker='football', edgecolors=text_color, s=8000 * h_goals['xG'],zorder=6, c=team1_facecolor,ax=axs['pitch'])
+    pitch.scatter(h_missed.x,h_missed.y,marker='o', edgecolors=team1_facecolor, s=7000 * h_missed['xG'],linewidth=3, c=background,ax=axs['pitch'])
+    pitch.scatter(h_saved.x,h_saved.y,marker='o', edgecolors='white', s=7000 * h_saved['xG'], c=team1_facecolor,linewidth=3,zorder=4,ax=axs['pitch'])
+    pitch.scatter(h_post.x,h_post.y,marker='o', edgecolors='green', s=7000 * h_post['xG'],linewidth=3, c=team1_facecolor,zorder=5,ax=axs['pitch'])
+    pitch.scatter(h_goals.x,h_goals.y,marker='football', edgecolors=text_color, s=9000 * h_goals['xG'],zorder=6,linewidths=3, c=team1_facecolor,ax=axs['pitch'])
     pitch.scatter(a_own_goals.x,a_own_goals.y,marker='football', edgecolors=team2_facecolor, s=1000,zorder=6, c=team1_facecolor,ax=axs['pitch'])
-    pitch.scatter(h_blocked.x,h_blocked.y,marker='s', edgecolors=text_color, s=3000 * h_blocked['xG'],zorder=6, c=team1_facecolor,ax=axs['pitch'])
+    pitch.scatter(h_blocked.x,h_blocked.y,marker='s', edgecolors=team1_facecolor, s=5000 * h_blocked['xG'],zorder=5,linewidth=3, c=background,ax=axs['pitch'])
 
 
-    pitch.scatter(a_missed.x,a_missed.y,marker='o', edgecolors=team2_facecolor, s=5000 * a_missed['xG'], c=background,ax=axs['pitch'])
-    pitch.scatter(a_saved.x,a_saved.y,marker='o', edgecolors='white', s=5000 * a_saved['xG'], c=team2_facecolor,zorder=4,ax=axs['pitch'])
-    pitch.scatter(a_post.x,a_post.y,marker='o', edgecolors='green', s=5000 * a_post['xG'], c=team2_facecolor,zorder=5,ax=axs['pitch'])
-    pitch.scatter(a_goals.x,a_goals.y,marker='football', edgecolors=text_color, s=8000 * a_goals['xG'],zorder=6, c=team2_facecolor,ax=axs['pitch'])
+    pitch.scatter(a_missed.x,a_missed.y,marker='o', edgecolors=team2_facecolor, s=7000 * a_missed['xG'],linewidth=3, c=background,ax=axs['pitch'])
+    pitch.scatter(a_saved.x,a_saved.y,marker='o', edgecolors='white', s=7000 * a_saved['xG'], c=team2_facecolor,linewidth=3,zorder=4,ax=axs['pitch'])
+    pitch.scatter(a_post.x,a_post.y,marker='o', edgecolors='green', s=7000 * a_post['xG'], c=team2_facecolor,linewidth=3,zorder=5,ax=axs['pitch'])
+    pitch.scatter(a_goals.x,a_goals.y,marker='football', edgecolors=text_color, s=9000 * a_goals['xG'],zorder=6,linewidths=3, c=team2_facecolor,ax=axs['pitch'])
     pitch.scatter(h_own_goals.x,h_own_goals.y,marker='football', edgecolors=team1_facecolor, s=1000,zorder=6, c=team2_facecolor,ax=axs['pitch'])
-    pitch.scatter(a_blocked.x,a_blocked.y,marker='s', edgecolors=text_color, s=3000 * a_blocked['xG'],zorder=6, c=team2_facecolor,ax=axs['pitch'])
+    pitch.scatter(a_blocked.x,a_blocked.y,marker='s', edgecolors=team2_facecolor, s=5000 * a_blocked['xG'],zorder=5,linewidth=3, c=background,ax=axs['pitch'])
 
 
 
@@ -2165,13 +2167,7 @@ def shotMap_ws(df,axs,fig,pitch,hteam,ateam,team1_facecolor,team2_facecolor,text
     pitch.scatter(90,-5,marker='s', edgecolors=text_color,linewidth=3, s=1000, c=background,ax=axs['pitch'])
     pitch.annotate('Blocked', xy=(98,-5), fontsize=30,color=text_color,fontproperties=font_prop,ax=axs['pitch'], ha='center', va='center')
 
-    pitch.annotate('ShotMap', xy=(1, 75),fontproperties=font_prop, fontsize=80,color=text_color,ax=axs['pitch'], ha='left', va='center')
-
-    logo = mpimg.imread('C:/Users/acer/Documents/GitHub/IndianCitizen/ScorePredict/Score Logos-20241022T100701Z-001/Score Logos/ScoreSquareWhite.png')
-
-    ax_image = add_image(
-        logo, fig, left=0.78, bottom=0.84, width=0.08, height=0.08,aspect='equal'
-    )
+    #pitch.annotate('ShotMap', xy=(1, 75),fontproperties=font_prop, fontsize=80,color=text_color,ax=axs['pitch'], ha='left', va='center')
 
     hteam_img = mpimg.imread(f'C:\\Users\\acer\\Documents\\GitHub\\IndianCitizen\\ScorePredict\\Images\\TeamLogos\\{hteam}.png')
 
@@ -2261,11 +2257,15 @@ def xgFlow(ax,home_shots_df,away_shots_df,team1,team2,team1_facecolor,team2_face
                 # We want the goals to be on top of the lines
                 zorder=5
             )
-            
+            ymin, ymax = ax.get_ylim()
+            y_range = ymax - ymin
+
+            # Define a vertical offset as a percentage of the y-range
+            offset_y = 0.08 * y_range
             # add a label to the goals for the player who scored
             ax.text(
                 x['minute']+1, 
-                x['cumulative_xG'] + .15, 
+                x['cumulative_xG'] + offset_y, 
                 f"{x['playerName']}\nxG: {round(x['xG'],2)}", 
                 ha='center', 
                 va='center',
@@ -2279,7 +2279,7 @@ def xgFlow(ax,home_shots_df,away_shots_df,team1,team2,team1_facecolor,team2_face
     ax.set_xticks([0, 45, 90])
     ax.set_xticklabels(['0\'', '45\'', '90\''])
     
-    ax.text(-0.8, df_xG['cumulative_xG'].max() + 0.15, 'xG Flow', ha='left',fontproperties=font_prop, fontsize=50,color='white')
+    #ax.text(-0.9, df_xG['cumulative_xG'].max() + 0.12, 'xG Flow', ha='left',fontproperties=font_prop, fontsize=50,color='white')
     
     # Let's label the y axis with the cumulative xG
     ax.set_ylabel('Cumulative xG', fontfamily='monospace',fontproperties=font_prop, fontsize=22,color=text_color)
@@ -2486,33 +2486,89 @@ def pass_network_visualization(ax,df, passes_between_df, average_locs_and_count_
     
     return
 
-def passmaps(ax,df,team,team_color,flipped=False):
-    mask_passes = (df.type == 'Pass') & (df.teamName == team)
-    team_passes_df = df.loc[mask_passes]
+def get_passing_stats(match_df, teamName):
+    passes_df = match_df[(match_df['type'] == 'Pass') & (match_df['teamName'] == teamName)].copy()
+    total_passes = passes_df[passes_df['teamName'] == teamName].shape[0]
+    successful_passes = passes_df[(passes_df['teamName'] == teamName) & (passes_df['outcomeType'] == 'Successful')].shape[0]
+    passing_accuracy = (successful_passes / total_passes) * 100
+    final_third_passes = passes_df[(passes_df['teamName'] == teamName) & (passes_df['x'] < 75) & (passes_df['endX'] >= 75) & (passes_df['outcomeType'] == 'Successful')].shape[0]
+    key_passes = passes_df[(passes_df['teamName'] == teamName) & (passes_df['passKey'] == True)].shape[0]
+    crosses = passes_df[(passes_df['teamName'] == teamName) & (passes_df['qualifiers'].str.contains('Cross'))].shape[0]
+    long_balls = passes_df[(passes_df['teamName'] == teamName) & (passes_df['qualifiers'].str.contains('Longball'))].shape[0]
+    through_balls = passes_df[(passes_df['teamName'] == teamName) & (passes_df['qualifiers'].str.contains('Throughball'))].shape[0]
+    progressive_passes = passes_df[(passes_df['teamName'] == teamName) & (passes_df['prog_pass']>=9.11) & (passes_df['x']>=35)].shape[0]
+    pen_box_passes = passes_df[(passes_df['teamName'] == teamName) & (passes_df['endX']>=88.5) & (passes_df['endY']>=13.6) & (passes_df['endY']<=54.4)].shape[0]
+    xT_by_Pass = passes_df['xT'].sum().round(3)
 
-    pitch = Pitch(pitch_type='uefa', corner_arcs=True, pitch_color=background,
-                  line_zorder=2,line_color='white', linewidth=1.5)
+    result_df = pd.DataFrame({
+        'Team': [teamName],
+        'Total Passes': [int(total_passes)],
+        'Passing Accuracy (%)': [round(passing_accuracy, 2)],
+        'Final Third Entries': [int(final_third_passes)],
+        'Key Passes': [int(key_passes)],
+        'Crosses': [int(crosses)],
+        'Long Balls': [int(long_balls)],
+        'Through Balls': [int(through_balls)],
+        'Progressive Passes': [int(progressive_passes)],
+        'Pen Box Passes': [int(pen_box_passes)],
+        'Expected Threat By Pass': [xT_by_Pass]
+    })
+
+    return result_df
+
+def passmaps(ax,match_df,team,team_color,background,text_color,passtype):
+    mask_passes = (match_df.type == 'Pass') & (match_df.teamName == team)
+    team_passes_df = match_df.loc[mask_passes]
+
+    pitch = VerticalPitch(pitch_type='uefa',half=True, corner_arcs=True, pitch_color=background,
+                  line_zorder=2,line_color='white', linewidth=1)
     pitch.draw(ax=ax)
-    bins = (6, 4)
     ax.set_facecolor(background)
+    if passtype == 'Final Third Entries':
+        team_passes_df = team_passes_df[(team_passes_df['x'] < 75) & (team_passes_df['endX'] >= 75) & (team_passes_df['outcomeType'] == 'Successful')]
+        for _,row in team_passes_df.iterrows():
+            marker = '*' if row['passKey'] else 'o'
+            size = 1000 if row['passKey'] else 200
+            color = 'green' if row['assist'] else team_color
+            linewidth = 5 if row['assist'] else 1
+            pitch.lines(row.x, row.y, row.endX, row.endY,lw=linewidth, color=color, alpha=0.8, zorder=2, ax=ax)
+            pitch.scatter(row.endX, row.endY,marker=marker, s=size, color=color, edgecolor=text_color, linewidth=2, zorder=3, ax=ax)
 
-    if flipped==True:
-        ax.invert_xaxis()
-        ax.invert_yaxis()
-        ax.text(80,-7,"PassFlow HeatMap", color='white', fontsize=25,fontproperties=font_prop)
-      
-    else:
-        ax.text(25,75,"PassFlow HeatMap", color='white', fontsize=25,fontproperties=font_prop)
-        
+    elif passtype == 'Crosses':
+        team_passes_df = team_passes_df[(team_passes_df['qualifiers'].str.contains('Cross')) & (team_passes_df['outcomeType'] == 'Successful')]
+        for _,row in team_passes_df.iterrows():
+            marker = '*' if row['passKey'] else 'o'
+            size = 1000 if row['passKey'] else 200
+            color = 'green' if row['assist'] else team_color
+            linewidth = 5 if row['assist'] else 1
+            pitch.lines(row.x, row.y, row.endX, row.endY,lw=linewidth, color=color, alpha=0.8, zorder=2, ax=ax)
+            pitch.scatter(row.endX, row.endY,marker=marker, s=size, color=color, edgecolor=text_color, linewidth=2, zorder=3, ax=ax)
     
-    # plot the heatmap - darker colors = more passes originating from that square
-    bs_heatmap = pitch.bin_statistic(team_passes_df.x, team_passes_df.y, statistic='count', bins=bins)
-    # Create a custom colormap based on the team's color
-    cmap = LinearSegmentedColormap.from_list('custom_cmap', ['#FFFFFF', team_color])  # White to team color
-    hm = pitch.heatmap(bs_heatmap, ax=ax, cmap=cmap)
-    # plot the pass flow map with a single color ('black') and length of the arrow (5)
-    fm = pitch.flow(team_passes_df.x, team_passes_df.y, team_passes_df.endX, team_passes_df.endY,
-                    color='black', arrow_type='same',arrow_length=5, bins=bins, ax=ax)
+    elif passtype == 'Long Balls':
+        team_passes_df = team_passes_df[(team_passes_df['qualifiers'].str.contains('Longball')) & (team_passes_df['outcomeType'] == 'Successful')]
+        for _,row in team_passes_df.iterrows():
+            marker = '*' if row['passKey'] else 'o'
+            size = 1000 if row['passKey'] else 200
+            color = 'green' if row['assist'] else team_color
+            linewidth = 5 if row['assist'] else 1
+            pitch.lines(row.x, row.y, row.endX, row.endY,lw=linewidth, color=color, alpha=0.8, zorder=2, ax=ax)
+            pitch.scatter(row.endX, row.endY,marker=marker, s=size, color=color, edgecolor=text_color, linewidth=2, zorder=3, ax=ax)
+    
+    elif passtype == 'Through Balls':
+        team_passes_df = team_passes_df[(team_passes_df['qualifiers'].str.contains('Throughball')) & (team_passes_df['outcomeType'] == 'Successful')]
+        for _,row in team_passes_df.iterrows():
+            marker = '*' if row['passKey'] else 'o'
+            size = 1000 if row['passKey'] else 200
+            color = 'green' if row['assist'] else team_color
+            linewidth = 5 if row['assist'] else 1
+            pitch.lines(row.x, row.y, row.endX, row.endY,lw=linewidth, color=color, alpha=0.8, zorder=2, ax=ax)
+            pitch.scatter(row.endX, row.endY,marker=marker, s=size, color=color, edgecolor=text_color, linewidth=2, zorder=3, ax=ax)
+
+    
+    player_pass_counts = team_passes_df.groupby(['playerName']).size().reset_index(name='Count')
+    top_passers = (player_pass_counts.sort_values(['Count'], ascending=[False]).head(5).reset_index(drop=True))
+    
+    return top_passers
     
 def plot_donut_charts(ax, action_types, team_a_stats, team_b_stats, team1, team2,team1_facecolor, team2_facecolor):
     # Ensure the main axis background is black
