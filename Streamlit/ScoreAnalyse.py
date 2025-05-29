@@ -1,12 +1,12 @@
 import streamlit as st
 
-st.title("ShotAnalyse")
+st.title("ScoreAnalyse")
 st.subheader("Football Analytics App")
 
 st.markdown("""
-## Welcome to the Shot Analysis Dashboard!  
+## Welcome to the Score Analysis App!  
 
-Explore the intricate details of football shot data from the past decade across Europe's Top 5 leagues. This app leverages data sourced weekly from the Understat API to bring you insights into the game like never before.  
+Explore the intricate details of football event data across Europe's Top 5 leagues and more. This app leverages data sourced weekly to bring you insights into the game like never before.  
 
 ### Key Features:  
 - **Shot Location Analysis**: Visualize where teams and players take their shots from across different match scenarios.  

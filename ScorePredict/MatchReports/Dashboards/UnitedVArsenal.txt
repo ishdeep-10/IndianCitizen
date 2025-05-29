@@ -1,0 +1,29 @@
+An exciting encounter at Old Trafford where United showed much overall improvements against Arsenal.
+
+
+Match Statistics Overview
+Arsenal had more possession (68% vs 32%), indicating dominance in ball control.
+They also attempted significantly more accurate passes (90% accuracy vs 75%).
+Goalkeepers on both sides made 5 saves each, suggesting a competitive match with strong defensive performances. Specially David Raya who made a couple of outrageous saves to prevent his team conceding very good chances.
+
+Shot Map & Goal Comparison
+Manchester United (Left Shot Map): Fewer shots overall, with a mix of headers and close-range attempts. They scored 1 goal with an expected goals (xG) value of 1.31.
+Arsenal (Right Shot Map): More shots taken, particularly from inside the box. Their xG is slightly higher at 1.87, but they also scored only 1 goal.
+
+Manchester United: Their passing network shows a reliance on central players, especially Bruno and Casemiro. They built up through the middle, using short passes.
+Arsenal: Their network is more structured, with wide players like Rice and Odegaard heavily involved in the buildup. They focused more on progressive passing towards the final third.
+
+The xG flow chart shows that Arsenal had a more consistent buildup of expected goals over the match, with key goals from Rice and a brilliant first half free kick from Fernandes.
+The Momentum Flow chart highlights fluctuations in attacking pressure. Arsenal had multiple dominant phases, while Manchester United had shorter spells of attacking momentum.
+
+Final Third Entries
+Manchester United: Only 20 final third entries, relying more on carries (7) than passes (13).
+Arsenal: Had an overwhelming 74 final third entries, with a major reliance on passing (60 entries) compared to carries (14). This again highlights their superior control and structured attack to get into the pen box but struggled to create clear cut chances for most of them.
+
+Defensive Actions
+Both teams have defensive actions mapped, with more density in key defensive zones.
+Arsenal’s defensive actions are spread out, while Manchester United's are more clustered in deeper areas, indicating that they were often defending in their own half.
+
+Duels Won
+The duels map shows a balanced contest, but Arsenal won more battles in midfield and wide areas.
+Manchester United’s duels were more concentrated in defensive zones, possibly indicating struggles to regain possession higher up the pitch.

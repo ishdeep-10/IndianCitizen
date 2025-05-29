@@ -1,0 +1,13 @@
+VVD - 
+
+Action Name	Count (Rank)
+Clearance       167 (9)
+BallRecovery    105 (54)
+Aerial           75 (3)
+Interception     53 (4)
+Tackle           16 (41)
+BlockedPass      10 (32)
+
+
+3 - 
+Liverpool has created the most Big Chances (96) and converted the most too (52)

@@ -1,0 +1,38 @@
+player_team
+Alexander Isak (Newcastle)               488
+Yoane Wissa (Brentford)                  442
+Jean-Philippe Mateta (Crystal Palace)    404
+Jorgen Strand Larsen (Wolves)            394
+Mikel Merino (Arsenal)                   393
+Nicolas Jackson (Chelsea)                385
+Liam Delap (Ipswich)                     382
+Erling Haaland (Man City)                375
+Ollie Watkins (Aston Villa)              371
+Chris Wood (Nottingham Forest)           353
+Dominic Solanke (Tottenham)              319
+Danny Welbeck (Brighton)                 310
+Rasmus Hojlund (Man Utd)                 296
+Paul Onuachu (Southampton)               272
+Jamie Vardy (Leicester)                  267
+Beto (Everton)                           258
+Evanilson (Bournemouth)                  234
+Darwin Nunez (Liverpool)                 204
+Rodrigo Muniz (Fulham)                   182
+Danny Ings (West Ham)                     74
+
+
+Analysis - 
+
+-> The strikers who mostly likes to get the ball in the opponent penalty box
+Haaland , Danny Ings , Vardy , Muniz , Nunez , Wood
+
+-> Strikers who likes to drop deep into midfield to receive the ball for combination play
+ Danny Welbeck , Dominic Solanke , Mateta , Wissa , Evanilson , Jackson
+
+-> Strikers who have to drop deep because of the way their teams play (defensive)
+  Onucachu , Beto , Delap (could be considered for above too), Wood
+
+-> Strikers who likes to run in behind defensive lines on either side
+   Isak , Hojlund , Nunez , Watkins , Larsen , Jackson
+
+Merino is a special case because he is natuarally a midfielder who has been playing as a striker for Arsenal due to their injuries. He likes to still drop deep on either side to collect the ball and move around to suit how Arsenal likes to play.
